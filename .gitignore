@@ -1,7 +1,7 @@
 cache/
 dist/
 nbpackage/
-
+.DS_Store
 *.tar.gz
 *.zip
-
+.env
