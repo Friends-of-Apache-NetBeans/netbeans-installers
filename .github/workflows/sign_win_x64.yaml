@@ -13,7 +13,7 @@ jobs:
         id: upload-unsigned-artifact
         uses: actions/upload-artifact@v4
         with: 
-          path: windows-exe-x64
+          path: windows-exe-x64.zip
       - id: optional_step_id
         uses: signpath/github-action-submit-signing-request@v1
         with:
@@ -23,4 +23,4 @@ jobs:
           signing-policy-slug: 'test-signing'
           github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
           wait-for-completion: true
-          output-artifact-directory: windows-exe-x86-signed
+          output-artifact-directory: windows-exe-x86-signed.zip
