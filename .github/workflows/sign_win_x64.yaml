@@ -23,4 +23,4 @@ jobs:
           signing-policy-slug: 'test-signing'
           github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
           wait-for-completion: true
-          output-artifact-directory: windows-exe-x86-signed.zip
+          output-artifact-directory: windows-exe-x64-signed.zip
