@@ -173,7 +173,7 @@ jobs:
         env:
           INNOSETUP_PATH: 'C:\\Program Files (x86)\\Inno Setup 6\\iscc.exe'
         run: java Exec.java build windows x64 innosetup
-      - name: get_artifact_name
+      - name: Get artifact name
         id: list_artifact
         run: echo "artifact=$(ls dist/*.exe)" >> $GITHUB_OUTPUT
       - name: Upload unsigned
@@ -181,7 +181,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-exe-x64-unsigned
-          path: '${{ steps.list_artifact.outputs.artifact }}'
+          path: |
+          - dist/*.exe
+          - dis/*.exe.sha*
       - name: Sign with signpath
         id: signing
         uses: signpath/github-action-submit-signing-request@v1
