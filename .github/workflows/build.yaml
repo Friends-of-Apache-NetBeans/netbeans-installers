@@ -195,6 +195,14 @@ jobs:
           github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
           wait-for-completion: true
           output-artifact-directory: signed
+      - name: Upload signed
+        id: upload-signed-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe-x64-signed
+          path: |
+            signed/*.exe
+            signed/*.exe.sha*
 
   build-macos-arm:
     name: Build macOS .pkg for aarch64
