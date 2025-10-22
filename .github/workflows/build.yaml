@@ -181,7 +181,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-exe-x64-unsigned
-          path: '${{ steps.list_artifact.artifact }}'
+          path: '${{ steps.list_artifact.outputs.artifact }}'
       - name: Sign with signpath
         id: signing
         uses: signpath/github-action-submit-signing-request@v1
