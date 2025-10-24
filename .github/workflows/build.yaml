@@ -173,9 +173,6 @@ jobs:
         env:
           INNOSETUP_PATH: 'C:\\Program Files (x86)\\Inno Setup 6\\iscc.exe'
         run: java Exec.java build windows x64 innosetup
-      - name: Get artifact name
-        id: list_artifact
-        run: echo "artifact=$(ls dist/*.exe)" >> $GITHUB_OUTPUT
       - name: Upload unsigned
         id: upload-unsigned-artifact
         uses: actions/upload-artifact@v4
@@ -184,25 +181,25 @@ jobs:
           path: |
             dist/*.exe
             dis/*.exe.sha*
-      - name: Sign with signpath
-        id: signing
-        uses: signpath/github-action-submit-signing-request@v1
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'installers_win'
-          signing-policy-slug: 'test_signing'
-          github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
-          wait-for-completion: true
-          output-artifact-directory: signed
-      - name: Upload signed
-        id: upload-signed-artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-exe-x64-signed
-          path: |
-            signed/*.exe
-            signed/*.exe.sha*
+      # - name: Sign with signpath
+      #   id: signing
+      #   uses: signpath/github-action-submit-signing-request@v1
+      #   with:
+      #     api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+      #     organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
+      #     project-slug: 'installers_win'
+      #     signing-policy-slug: 'test_signing'
+      #     github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
+      #     wait-for-completion: true
+      #     output-artifact-directory: signed
+      # - name: Upload signed
+      #   id: upload-signed-artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: windows-exe-x64-signed
+      #     path: |
+      #       signed/*.exe
+      #       signed/*.exe.sha*
 
   build-macos-arm:
     name: Build macOS .pkg for aarch64
