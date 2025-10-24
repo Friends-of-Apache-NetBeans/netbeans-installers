@@ -180,7 +180,7 @@ jobs:
           name: windows-exe-x64-unsigned
           path: |
             dist/*.exe
-            dis/*.exe.sha*
+            dist/*.exe.sha*
       - name: Sign with signpath
         id: signing
         uses: signpath/github-action-submit-signing-request@v1
@@ -190,6 +190,8 @@ jobs:
           project-slug: 'installers_win'
           signing-policy-slug: 'test_signing'
           github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
+          # we may have to wait a bit because the approver may be slow
+          wait-for-completion-timeout-in-seconds: 86400
           wait-for-completion: true
           output-artifact-directory: signed
       - name: Upload signed
