@@ -180,7 +180,6 @@ jobs:
           name: windows-exe-x64-unsigned
           path: |
             dist/*.exe
-            dist/*.exe.sha*
       - name: Sign with signpath
         id: signing
         uses: signpath/github-action-submit-signing-request@v1
