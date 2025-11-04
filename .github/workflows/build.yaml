@@ -21,7 +21,9 @@ on:
       build-macos-x64:
         description: 'Build macOS .pkg for x86_64'
         type: boolean
-
+      netbeans-release:
+        description: 'release name as in 27 or 28-rc3'
+        type: string
 
 jobs:
   
@@ -79,6 +81,21 @@ jobs:
           path: |
             dist/*.deb
             dist/*.deb.sha*
+      - name: Fetch release URL
+        id: get_release_url
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload release deb
+        id: upload_release_deb
+        uses: actions/upload-release-asset@v1.0.2
+        env: 
+          GITHUB_TOKEN: ${{ github.token }}
+        with: 
+          upload_url: ${{ steps.get_release_url.outputs.upload_url }}
+          asset_path: dist/*.deb
+          asset_name: Apache-NetBeans-${{ inputs.netbeans-release }}_amd64.deb
+          asset_content_type: application/vnd.debian.binary-package
 
   build-deb-arm:
     name: Build Linux .deb for aarch64
