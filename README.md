@@ -22,8 +22,10 @@ on the workflow output page.
 
 ## Current build limitations
 
-The Windows installer must currently be downloaded and code signed before
-distribution.
+The Windows installer is currently signed in the build step with a test certificate.
+To test the windows installer, import the test certificate in Windows first.
+
+[Test certificate in PEM format](FoAN-test.pem) [Test certificate in CER format](FoAN-test.cer) 
 
 The macOS packages will be code signed in the build if the relevant secrets and
 ID variables are added to the GitHub repository. They must be downloaded,
