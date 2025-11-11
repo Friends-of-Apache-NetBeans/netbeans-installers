@@ -59,13 +59,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Get release
-        id: get_release
-        uses: bruceadams/get-release@v1.3.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          id: v${{ inputs.netbeans-release }}
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -88,15 +81,6 @@ jobs:
           path: |
             dist/*.deb
             dist/*.deb.sha*
-      - name: upload release binary
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: dist/Apache-NetBeans-${{ inputs.netbeans-release }}.deb
-          asset_name: Apache-NetBeans-${{ inputs.netbeans-release }}
-          asset_content_type: application/vnd.debian.binary-package
 
   build-deb-arm:
     name: Build Linux .deb for aarch64
