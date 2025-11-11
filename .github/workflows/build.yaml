@@ -65,7 +65,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          if: v${{ inputs.netbeans-release }}
+          id: v${{ inputs.netbeans-release }}
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
