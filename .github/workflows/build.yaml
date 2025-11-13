@@ -188,7 +188,7 @@ jobs:
         with:
           api-token: '${{ secrets.SIGNPATH_SIGNER_TOKEN }}'
           organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'installers_win'
+          project-slug: 'FoAN_installer'
           signing-policy-slug: 'test_signing'
           github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
           # we may have to wait a bit because the approver may be slow
