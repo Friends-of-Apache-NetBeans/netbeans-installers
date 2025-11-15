@@ -326,7 +326,7 @@ jobs:
 
   release:
     name: Create Release
-    if: ${{ always() && startsWith(github.ref,'v')}}
+    if: ${{ always() }}
     needs: [build-deb-x64,build-deb-arm,build-rpm-x64,build-windows-x64,build-macos-arm,build-macos-x64]
     runs-on: ubuntu-latest
     permissions:
