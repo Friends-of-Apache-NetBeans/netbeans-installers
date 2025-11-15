@@ -353,6 +353,6 @@ jobs:
 
       - name: Upload release artifacts
         id: upload_release_artifacts
-        run: gh release upload --clobber ${{ github.ref_name }} -R $GITHUB_REPOSITORY $(find artifacts -type f)
+        run: gh release upload --clobber ${{ github.ref_name }} -R $GITHUB_REPOSITORY $(find artifacts -type f ! -name "*.sha256")
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
