@@ -323,3 +323,36 @@ jobs:
           path: |
             dist/*.pkg
             dist/*.pkg.sha*
+
+  release:
+    name: Create Release
+    if: ${{ allways() && startsWith(github.ref,'v')}}
+    needs: [build-deb-x64,build-deb-arm,build-rpm-x64,build-linux-rpm,build-windows-x64,build-macos-arm,build-macos-x64]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: comnoco/create-release-action@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+
+      - name: Upload release artifacts
+        id: upload_release_artifacts
+        run: gh release upload --clobber ${{ github.ref_name }} -R $GITHUB_REPOSITORY $(find artifacts -type f)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
