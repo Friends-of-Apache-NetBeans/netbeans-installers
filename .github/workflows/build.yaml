@@ -82,10 +82,11 @@ jobs:
         with:
           name: linux-deb-x64
           path: |
-            dist/*
+            dist/*.deb
+            dist/*.deb.sha*
 
   build-deb-arm:
-    name: Build Linux .deb for aarch64
+    name: Build Linux .deb for arm64
     if: ${{ inputs.build-deb-arm }}
     needs: validate
     runs-on: ubuntu-24.04-arm
@@ -207,7 +208,7 @@ jobs:
             signed/*.exe.sha*
 
   build-macos-arm:
-    name: Build macOS .pkg for aarch64
+    name: Build macOS .pkg for arm64
     if: ${{ inputs.build-macos-arm }}
     needs: validate
     runs-on: macos-14
