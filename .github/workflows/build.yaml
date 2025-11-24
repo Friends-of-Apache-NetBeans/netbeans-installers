@@ -110,7 +110,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: linux-deb-aarch64
+          name: linux-deb-arm64
           path: |
             dist/*.deb
             dist/*.deb.sha*
@@ -199,7 +199,7 @@ jobs:
         id: upload-signed-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-exe-x64-signed
+          name: windows-exe-x64
           path: |
             signed/*.exe
             signed/*.exe.sha*
@@ -259,7 +259,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: macos-pkg-aarch64
+          name: macos-pkg-arm64
           path: |
             dist/*.pkg
             dist/*.pkg.sha*
@@ -324,35 +324,3 @@ jobs:
             dist/*.pkg
             dist/*.pkg.sha*
 
-  release:
-    name: Create Release
-    if: ${{ always() }}
-    needs: [build-deb-x64,build-deb-arm,build-rpm-x64,build-windows-x64,build-macos-arm,build-macos-x64]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Display structure of downloaded files
-        run: ls -R artifacts
-
-      - name: Create Release
-        id: create_release
-        uses: comnoco/create-release-action@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ inputs.netbeans-release }}
-          release_name: Apache NetBeans release ${{ inputs.netbeans-release }}
-          draft: true
-          prerelease: false
-
-      - name: Upload release artifacts
-        id: upload_release_artifacts
-        run: gh release upload --clobber ${{ github.ref_name }} -R $GITHUB_REPOSITORY $(find artifacts -type f ! -name "*.sha256")
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
