@@ -73,14 +73,16 @@ jobs:
       - name: Build
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
-        run: java Exec.java build linux x64 deb
+        run: |
+          java Exec.java build linux x64 deb
+      - name: Display structure of downloaded files
+        run: find ./dist
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: linux-deb-x64
           path: |
-            dist/*.deb
-            dist/*.deb.sha*
+            dist/*
 
   build-deb-arm:
     name: Build Linux .deb for aarch64
