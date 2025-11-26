@@ -84,6 +84,7 @@ jobs:
           path: |
             dist/*.deb
             dist/*.deb.sha*
+            dist/*.frontmatter
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -117,6 +118,8 @@ jobs:
           path: |
             dist/*.deb
             dist/*.deb.sha*
+            dist/*.frontmatter
+
 
   build-rpm-x64:
     name: Build Linux .rpm for x86_64
@@ -152,6 +155,7 @@ jobs:
           path: |
             dist/*.rpm
             dist/*.rpm.sha*
+            dist/*.frontmatter
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
@@ -198,6 +202,9 @@ jobs:
           wait-for-completion-timeout-in-seconds: 86400
           wait-for-completion: true
           output-artifact-directory: signed
+      - name: Rehash
+        id: rehash
+        run: java Exec.java hash windows x64 innosetup signed
       - name: Upload signed
         id: upload-signed-artifact
         uses: actions/upload-artifact@v4
@@ -206,6 +213,7 @@ jobs:
           path: |
             signed/*.exe
             signed/*.exe.sha*
+            signed/*.frontmatter
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
@@ -266,6 +274,7 @@ jobs:
           path: |
             dist/*.pkg
             dist/*.pkg.sha*
+            dist/*.frontmatter
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
@@ -326,4 +335,6 @@ jobs:
           path: |
             dist/*.pkg
             dist/*.pkg.sha*
+            dist/*.frontmatter
+
 
