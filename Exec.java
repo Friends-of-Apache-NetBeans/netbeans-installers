@@ -237,7 +237,7 @@ public class Exec {
         Files.writeString(result.resolveSibling(fileName + ".sha256"),
                 resultHash + "  " + result.getFileName());
         String frontMatter="""
-                           %1$s-link:  %2$s
+                           %1$s-link: %2$s
                            %1$s-hash: %3$s
 
                            """.formatted(productIndentifier,
