@@ -40,6 +40,9 @@ jobs:
             RUN_ID=${{inputs.given-run-id}}
           fi
           gh run download -D artifacts ${RUN_ID}
+          echo -e "downloadbase: https://github.com/${{ github.repository }}/releases/download/${{ inputs.release-tag }}\n" > artifacts/frontmatter.txt
+          cat artifacts/*.frontmatter >> artifacts/frontmatter.txt
+
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
