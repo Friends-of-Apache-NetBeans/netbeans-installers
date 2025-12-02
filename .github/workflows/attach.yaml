@@ -42,15 +42,11 @@ jobs:
           gh run download -D artifacts ${RUN_ID}
           echo -e "downloadbase: https://github.com/${{ github.repository }}/releases/download/${{ inputs.release-tag }}\n" > artifacts/frontmatter.txt
           cat $(find artifacts -name "*.frontmatter") >> artifacts/frontmatter.txt
-
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Display structure of downloaded files
-        run: find ./artifacts
-
       - name: Attach to release
         id: attach_to_release
-        run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts -type f)
+        run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*" ! -name "*.frontmatter")
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
