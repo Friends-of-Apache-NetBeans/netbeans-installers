@@ -28,9 +28,10 @@ import java.util.stream.*;
  *
  * Usage -
  *
- * java Exec.java build os arch package-type java Exec.java
- * validate(|-downloads|-cache)
- *
+ * <ul>
+ * <li>{@code java Exec.java build os arch package-type}</li>
+ * <li>{@code java Exec.java validate[|-downloads|-cache]}</li>
+ * </ul>
  */
 public class Exec {
 
