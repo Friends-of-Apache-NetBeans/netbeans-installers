@@ -39,6 +39,7 @@ public class Exec {
     private static final String COMMAND_VALIDATE = "validate";
     private static final String COMMAND_VALIDATE_DOWNLOADS = "validate-downloads";
     private static final String COMMAND_VALIDATE_CACHE = "validate-cache";
+    private static final String COMMAND_HASH = "hash";
 
     private final Path workingDir, cacheDir;
     private final Properties config;
@@ -226,9 +227,24 @@ public class Exec {
             default ->
                 throw new IllegalStateException();
         };
+        String pckFormat= switch(type){
+            case "deb","rpm","pkg" -> type;
+            case "innosetup" -> "exe";
+            default -> type;
+        };
+        String fileName=result.getFileName().toString();
+        String productIndentifier="%1$s-%2$s-%3$s".formatted(os,pckFormat,arch);
         String resultHash = Hash.SHA256.hashFile(result);
-        Files.writeString(result.resolveSibling(result.getFileName().toString() + ".sha256"),
+        Files.writeString(result.resolveSibling(fileName + ".sha256"),
                 resultHash + "  " + result.getFileName());
+        String frontMatter="""
+                           %1$s-link: %2$s
+                           %1$s-hash: %3$s
+
+                           """.formatted(productIndentifier,
+                                   fileName,
+                                   resultHash );
+        Files.writeString(result.resolveSibling(fileName + ".frontmatter"), frontMatter);
     }
 
     void download(URI link, Path destination) throws IOException, InterruptedException {
@@ -258,6 +274,7 @@ public class Exec {
 
         final String command;
         final String os, arch, type;
+        Path distDir= Path.of("");
 
         String cmd = args.length == 0 ? COMMAND_VALIDATE : args[0];
         switch (cmd) {
@@ -272,6 +289,16 @@ public class Exec {
             }
             case COMMAND_VALIDATE, COMMAND_VALIDATE_DOWNLOADS, COMMAND_VALIDATE_CACHE -> {
                 os = arch = type = null;
+                command = cmd;
+            }
+            case COMMAND_HASH ->{
+                if (args.length != 5) {
+                    throw new IllegalArgumentException("Usage : hash <os> <arch> <package-type> <dist-dir>");
+                }
+                os = args[1];
+                arch = args[2];
+                type = args[3];
+                distDir = Path.of( args[4] );
                 command = cmd;
             }
             default ->
@@ -316,6 +343,9 @@ public class Exec {
             case COMMAND_BUILD -> {
                 exec.validate(false);
                 exec.build();
+            }
+            case COMMAND_HASH -> {
+                exec.processAndHashOutput(distDir);
             }
         }
 
