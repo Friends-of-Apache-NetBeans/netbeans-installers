@@ -20,7 +20,7 @@ jobs:
           path: site
       - name: show site
         run: |
-          find tree -type f
+          find site -type f
       - name: create-web-files
         run: |
           nbversion=$(cat installers/build.properties | grep netbeans.version | cut -d= -f2)
