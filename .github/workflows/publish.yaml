@@ -26,23 +26,20 @@ jobs:
         run: |
           (
           cd installers
-          nbversion=$(cat installers/build.properties | grep netbeans.version | cut -d= -f2)
+          nbversion=$(cat build.properties | grep netbeans.version | cut -d= -f2)
           cat - <<EOF > ../site/nb${nbversion}.md
           ---
           layout: release
           sb: nb${version}
           ---
           EOF
-          gh release download v28-build1 -D ../site/_data --clobber -p "*.yaml"
-          find ../site
+          gh release download -D ../site/_data --clobber -p "*.yaml"
           )
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: commit-web-changes
         run: |
           cd ${GITHUB_WORKSPACE}/site
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m"update website for publication"
           git push
