@@ -43,8 +43,8 @@ jobs:
           cd site
           ls _data
           ls *.md
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "Pieter van den Hombergh (homberghp)"
+          git config user.email "pieter.van.den.hombergh@gmail.com"
           git add .
           git commit -m"update website for publication"
           git push
