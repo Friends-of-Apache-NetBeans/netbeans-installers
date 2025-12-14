@@ -1,0 +1,40 @@
+# publish release to netbeans-installers-site
+name: Publish
+on: 
+  workflow_dispatch:
+
+jobs:
+  UpdateWeb:
+    name: Checkout this repo and website 
+    runs-on: ubuntu-24.04
+    steps:
+      - name: co-myrepo
+        uses: actions/checkout@v6
+        with: 
+          persist-credentials: false
+          path: installers
+      - name: co-web
+        uses: actions/checkout@v6
+        with: 
+          persist-credentials: false
+          path: site
+      - name: create-web-files
+        run: |
+          nbversion=$(cat installers/build.properties | grep netbeans.version | cut -d= -f2)
+          cat - <<EOF > site/nb${nbversion}.md
+          ---
+          layout: release
+          sb: nb${version}
+          ---
+          EOF
+          gh release download v28-build1 -D site/_data --clobber -p "*.yaml"
+      - name: commit-web-changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site
+          git commit -m"update website for publication"
+          git push
+
+          
+

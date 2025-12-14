@@ -26,10 +26,11 @@ import java.util.stream.*;
 /**
  * Source file for use in workflows for downloading and building installers.
  *
- * Usage -
+ * Usage: 
  *
  * <ul>
  * <li>{@code java Exec.java build os arch package-type}</li>
+ * <li>{@code java Exec.java validate[|-downloads|-cache]}</li>
  * <li>{@code java Exec.java validate[|-downloads|-cache]}</li>
  * </ul>
  */
@@ -237,14 +238,14 @@ public class Exec {
         String resultHash = Hash.SHA256.hashFile(result);
         Files.writeString(result.resolveSibling(fileName + ".sha256"),
                 resultHash + "  " + result.getFileName());
-        String frontMatter="""
-                           %1$s-link: %2$s
+        String webData="""
+                           %1$s-file: %2$s
                            %1$s-hash: %3$s
 
                            """.formatted(productIndentifier,
                                    fileName,
                                    resultHash );
-        Files.writeString(result.resolveSibling(fileName + ".frontmatter"), frontMatter);
+        Files.writeString(result.resolveSibling(fileName.substring(0,fileName.lastIndexOf('.')) + ".yaml"), webData);
     }
 
     void download(URI link, Path destination) throws IOException, InterruptedException {

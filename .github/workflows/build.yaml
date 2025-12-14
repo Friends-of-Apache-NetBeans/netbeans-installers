@@ -84,7 +84,7 @@ jobs:
           path: |
             dist/*.deb
             dist/*.deb.sha*
-            dist/*.frontmatter
+            dist/*.yaml
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -118,7 +118,7 @@ jobs:
           path: |
             dist/*.deb
             dist/*.deb.sha*
-            dist/*.frontmatter
+            dist/*.yaml
 
 
   build-rpm-x64:
@@ -155,7 +155,7 @@ jobs:
           path: |
             dist/*.rpm
             dist/*.rpm.sha*
-            dist/*.frontmatter
+            dist/*.yaml
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
@@ -213,7 +213,7 @@ jobs:
           path: |
             signed/*.exe
             signed/*.exe.sha*
-            signed/*.frontmatter
+            signed/*.yaml
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
@@ -274,7 +274,7 @@ jobs:
           path: |
             dist/*.pkg
             dist/*.pkg.sha*
-            dist/*.frontmatter
+            dist/*.yaml
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
@@ -335,6 +335,6 @@ jobs:
           path: |
             dist/*.pkg
             dist/*.pkg.sha*
-            dist/*.frontmatter
+            dist/*.yaml
 
 

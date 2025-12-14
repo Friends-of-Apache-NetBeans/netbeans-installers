@@ -40,13 +40,21 @@ jobs:
             RUN_ID=${{inputs.given-run-id}}
           fi
           gh run download -D artifacts ${RUN_ID}
-          echo -e "downloadbase: https://github.com/${{ github.repository }}/releases/download/${{ inputs.release-tag }}\n" > artifacts/frontmatter.txt
-          cat $(find artifacts -name "*.frontmatter") >> artifacts/frontmatter.txt
+          nbversion=$(cat build.properties | grep netbeans.version | cut -d= -f2)
+          jdkversion=$(cat build.properties | grep jdk.version | cut -d= -f2)
+          cat - <<EOF > artifacts/webdata.yaml
+          downloadbase: https://github.com/${{ github.repository }}/releases/download/${{ inputs.release-tag }}
+          netbeans-version: ${nbversion}
+          jdk-version: ${jdkversion}
+
+          EOF
+          cat $(find artifacts -name "*.yaml"  -type f ! -name "webdata.yaml") >> artifacts/webdata.yaml
+          mv artifacts/webdata.yaml artifacts/nb${nbversion}.yaml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Attach to release
         id: attach_to_release
-        run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*" ! -name "*.frontmatter")
+        run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*")
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
