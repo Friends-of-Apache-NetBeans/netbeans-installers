@@ -11,12 +11,12 @@ jobs:
       - name: co-myrepo
         uses: actions/checkout@v6
         with: 
-          persist-credentials: false
+          persist-credentials: true
           path: installers
       - name: co-web
         uses: actions/checkout@v6
         with: 
-          persist-credentials: false
+          persist-credentials: true
           repository: Friends-of-Apache-NetBeans/netbeans-installers-site
           path: site
       - name: show site
