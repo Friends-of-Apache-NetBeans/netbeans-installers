@@ -58,6 +58,7 @@ jobs:
         # run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*")
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.release-tag }}
           files: |
             artifacts/*.deb
             artifacts/*.rpm
