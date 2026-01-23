@@ -52,7 +52,9 @@ jobs:
           mv artifacts/webdata.yaml artifacts/nb${nbversion}.yaml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Show Artifacts
+        id: show_artifacts
+        run: ls -la artifacts
       - name: Attach to release
         id: attach_to_release
         # run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*")
