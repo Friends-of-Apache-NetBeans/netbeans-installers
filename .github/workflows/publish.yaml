@@ -39,17 +39,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: commit-web-changes
+        shell: bash
+        env: 
+          CI_COMMIT_MESSAGE: update website for publication
+          CI_COMMIT_AUTHOR: github-actions[bot]
+          CI_COMMIT_EMAIL: username@users.noreply.github.com
         run: |
           cd site
           ls _data
           ls *.md
-          git config user.name "Pieter van den Hombergh (homberghp)"
-          git config user.email "pieter.van.den.hombergh@gmail.com"
+          git config --global user.name ${{ env.CI_COMMIT_AUTHOR }}
+          git config --global user.email ${{ env.CI_COMMIT_EMAIL }}
           git add .
-          git commit -m"update website for publication"
+          git commit -m "update website for publication"
           git push
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           
 
