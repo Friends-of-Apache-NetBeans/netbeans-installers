@@ -54,7 +54,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Show Artifacts
         id: show_artifacts
-        run: ls -la artifacts
+        run: find artifacts -type f
       - name: Attach to release
         id: attach_to_release
         # run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*")
@@ -62,10 +62,10 @@ jobs:
         with:
           tag_name: ${{ inputs.release-tag }}
           files: |
-            artifacts/*.deb
-            artifacts/*.rpm
-            artifacts/*.pkg
-            artifacts/*.exe
-            artifacts/webdata.yaml
+            artifacts/*/*.deb
+            artifacts/*/*.rpm
+            artifacts/*/*.pkg
+            artifacts/*/*.exe
+            artifacts/nb*.yaml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
