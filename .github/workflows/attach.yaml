@@ -58,7 +58,7 @@ jobs:
       - name: Attach to release
         id: attach_to_release
         # run: gh release upload --clobber ${{ inputs.release-tag }} -R $GITHUB_REPOSITORY $(find artifacts/ -type f ! -name "*.sha*")
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
         with:
           tag_name: ${{ inputs.release-tag }}
           files: |
