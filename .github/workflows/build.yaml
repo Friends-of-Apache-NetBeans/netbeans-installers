@@ -26,8 +26,8 @@ on:
         type: string
       github-release: 
         description: |
-          github release tag like v29-rc2-build1
-          not that the release must be based on an existing tag
+          github release tag like v29-rc2-build1.
+          NOTE: the release must be based on an existing tag.
         type: string
 
 jobs:
@@ -82,10 +82,13 @@ jobs:
           DPKG_DEB_COMPRESSOR_TYPE: xz
         run: java Exec.java build linux x64 deb
       - name: Upload
-        run:
-          gh release upload --clobber ${{ inputs.github-release }} -R $GITHUB_REPOSITORY $(find dist/ -type f ! -name "*.sha*")
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        working-directory: ./dist
+        run: |
+          cat *.deb.sha*
+          gh release upload "${RELEASE_TAG}" *.*
 
   build-deb-arm:
     name: Build Linux .deb for arm64
