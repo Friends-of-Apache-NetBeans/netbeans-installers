@@ -1,0 +1,20 @@
+name: Taggy
+
+on:
+  workflow_dispatch:
+    inputs:
+      github-release-tag: 
+        description: 'github tag like v29-rc2'
+        type: string
+
+jobs:
+  ensure-release:
+    name: Ensure that the release exists
+    runs-on: ubuntu-24.04      
+    steps:
+      - uses: mukunku/tag-exists-action@v1.7.0
+        id: check-tag
+        with: 
+          tag: ${{ inputs.github-release-tag }}'v1.0'
+      - run: echo "Tag exists!"
+        if: steps.check-tag.outputs.exists == 'true'
