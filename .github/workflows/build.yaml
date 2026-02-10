@@ -54,7 +54,9 @@ jobs:
 
   ensure-release:
     name: Ensure that the release exists
-    runs-on: ubuntu-24.04      
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
