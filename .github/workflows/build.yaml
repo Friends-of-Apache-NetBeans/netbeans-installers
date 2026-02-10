@@ -99,6 +99,8 @@ jobs:
       - name: Upload
         run:
           gh release upload --clobber ${{ inputs.github-release-tag }} -R $GITHUB_REPOSITORY $(find dist/ -type f ! -name "*.sha*")
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   build-deb-arm:
     name: Build Linux .deb for arm64
