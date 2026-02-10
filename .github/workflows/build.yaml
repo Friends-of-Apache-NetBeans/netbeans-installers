@@ -62,10 +62,12 @@ jobs:
         #   persist-credentials: false
       - name: CheckOrCreate
         run: | 
-          if [ gh release view ${{ inputs.github-release-tag }} &> /dev/null ]; then 
+          if [[ $(gh release view ${{ inputs.github-release-tag }} &> /dev/null) ]]; then 
             echo "proceed with ${{ inputs.github-release-tag }}"
           else
-            gh release create ${{ inputs.github-release-tag }}
+            # create a release as draft. 
+            # can be changed in github web ui
+            gh release create -d ${{ inputs.github-release-tag }} 
             echo "newly created ${{ inputs.github-release-tag }}"
           fi
         env:
