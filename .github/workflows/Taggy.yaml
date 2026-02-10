@@ -15,6 +15,6 @@ jobs:
       - uses: mukunku/tag-exists-action@v1.7.0
         id: check-tag
         with: 
-          tag: ${{ inputs.github-release-tag }}'v1.0'
+          tag: ${{ inputs.github-release-tag }}
       - run: echo "Tag exists!"
         if: steps.check-tag.outputs.exists == 'true'
