@@ -214,10 +214,9 @@ jobs:
       - name: Upload
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./signed
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.exe *.yaml
+          gh release upload --clobber "${{ inputs.github-release }}" *.exe *.yaml
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
