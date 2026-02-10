@@ -24,6 +24,9 @@ on:
       netbeans-release:
         description: 'release name as in 27 or 28-rc3'
         type: string
+      github-release-tag: 
+        description: 'github tag like v29-rc2'
+        type: string
 
 jobs:
   
@@ -49,6 +52,22 @@ jobs:
       - name: Validate and cache
         run: java Exec.java validate-cache
 
+  ensure-release:
+    name: Ensure that the release exists
+    runs-on: ubuntu-24.04      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: CheckOrCreate
+        run: | 
+          if [ gh release view v29-rc3-build1 &> /dev/null ]; then 
+            echo "proceed with ${{ inputs.github-release-tag }}"
+          else
+            gh release create ${{ inputs.github-release-tag }}
+            echo "newly created ${{ inputs.github-release-tag }}"
+          fi
   build-deb-x64:
     name: Build Linux .deb for x86_64
     if: ${{ inputs.build-deb-x64 }}
@@ -75,13 +94,8 @@ jobs:
           DPKG_DEB_COMPRESSOR_TYPE: xz
         run: java Exec.java build linux x64 deb
       - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-deb-x64
-          path: |
-            dist/*.deb
-            dist/*.deb.sha*
-            dist/*.yaml
+        run:
+          gh release upload --clobber ${{ inputs.github-release-tag }} -R $GITHUB_REPOSITORY $(find dist/ -type f ! -name "*.sha*")
 
   build-deb-arm:
     name: Build Linux .deb for arm64
