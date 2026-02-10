@@ -58,11 +58,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+        # with:
+        #   persist-credentials: false
       - name: CheckOrCreate
         run: | 
-          if [ gh release view v29-rc3-build1 &> /dev/null ]; then 
+          if [ gh release view ${{ inputs.github-release-tag }} &> /dev/null ]; then 
             echo "proceed with ${{ inputs.github-release-tag }}"
           else
             gh release create ${{ inputs.github-release-tag }}
