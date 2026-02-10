@@ -245,7 +245,7 @@ public class Exec {
                            """.formatted(productIndentifier,
                                    fileName,
                                    resultHash );
-        Files.writeString(result.resolveSibling(fileName.substring(0,fileName.lastIndexOf('.')) + ".yaml"), webData);
+        Files.writeString(result.resolveSibling(fileName+ ".yaml"), webData);
     }
 
     void download(URI link, Path destination) throws IOException, InterruptedException {
