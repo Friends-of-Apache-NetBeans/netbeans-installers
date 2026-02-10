@@ -5,3 +5,5 @@ nbpackage/
 *.tar.gz
 *.zip
 .env
+artifacts/
+dist/

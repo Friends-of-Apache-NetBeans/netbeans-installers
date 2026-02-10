@@ -88,7 +88,7 @@ jobs:
         working-directory: ./dist
         run: |
           cat *.deb.sha*
-          gh release upload "${RELEASE_TAG}" *.*
+          gh release upload --clobber "${RELEASE_TAG}" *.deb *.yaml
 
   build-deb-arm:
     name: Build Linux .deb for arm64
