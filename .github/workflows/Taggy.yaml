@@ -10,11 +10,21 @@ on:
 jobs:
   ensure-release:
     name: Ensure that the release exists
-    runs-on: ubuntu-24.04      
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
-      - uses: mukunku/tag-exists-action@v1.7.0
-        id: check-tag
-        with: 
-          tag: ${{ inputs.github-release-tag }}
-      - run: echo "Tag exists!"
-        if: steps.check-tag.outputs.exists == 'true'
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: CheckOrCreate
+        run: | 
+          if [[ $(gh release view ${{ inputs.github-release-tag }} &> /dev/null) ]]; then 
+            echo "proceed with ${{ inputs.github-release-tag }}"
+          else
+            # create a release as draft. 
+            # can be changed in github web ui
+            gh release create -d ${{ inputs.github-release-tag }} 
+            echo "newly created ${{ inputs.github-release-tag }}"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
