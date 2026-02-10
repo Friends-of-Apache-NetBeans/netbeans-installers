@@ -95,6 +95,8 @@ jobs:
     if: ${{ inputs.build-deb-arm }}
     needs: validate
     runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -129,6 +131,8 @@ jobs:
     if: ${{ inputs.build-rpm-x64 }}
     needs: validate
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -165,6 +169,8 @@ jobs:
     if: ${{ inputs.build-windows-x64 }}
     needs: validate
     runs-on: windows-2022
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -222,6 +228,8 @@ jobs:
     if: ${{ inputs.build-macos-arm }}
     needs: validate
     runs-on: macos-14
+    permissions:
+      contents: write
     defaults:
       run:
         shell: bash
@@ -283,6 +291,8 @@ jobs:
     if: ${{ inputs.build-macos-x64 }}
     needs: validate
     runs-on: macos-14
+    permissions:
+      contents: write
     defaults:
       run:
         shell: bash
