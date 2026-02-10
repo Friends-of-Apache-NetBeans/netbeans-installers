@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v6
       - name: CheckOrCreate
         run: | 
-          if [[ $(gh release view ${{ inputs.github-release-tag }} &> /dev/null) ]]; then 
+          if [[ $(gh release list | grep -q ${{ inputs.github-release-tag }}  ]]; then 
             echo "proceed with ${{ inputs.github-release-tag }}"
           else
             # create a release as draft. 
