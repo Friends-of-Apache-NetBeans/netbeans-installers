@@ -68,6 +68,8 @@ jobs:
             gh release create ${{ inputs.github-release-tag }}
             echo "newly created ${{ inputs.github-release-tag }}"
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
