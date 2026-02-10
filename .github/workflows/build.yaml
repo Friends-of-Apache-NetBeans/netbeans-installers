@@ -24,8 +24,10 @@ on:
       netbeans-release:
         description: 'release name as in 27 or 28-rc3'
         type: string
-      github-release-tag: 
-        description: 'github tag like v29-rc2'
+      github-release: 
+        description: |
+          github release tag like v29-rc2-build1
+          not that the release must be based on an existing tag
         type: string
 
 jobs:
@@ -52,33 +54,10 @@ jobs:
       - name: Validate and cache
         run: java Exec.java validate-cache
 
-  ensure-release:
-    name: Ensure that the release exists
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        # with:
-        #   persist-credentials: false
-      - name: CheckOrCreate
-        run: | 
-          if [[ $(gh release view ${{ inputs.github-release-tag }} &> /dev/null) ]]; then 
-            echo "proceed with ${{ inputs.github-release-tag }}"
-          else
-            # create a release as draft. 
-            # can be changed in github web ui
-            gh release create -d ${{ inputs.github-release-tag }} 
-            echo "newly created ${{ inputs.github-release-tag }}"
-          fi
-        env:
-          GH_TOKEN: ${{ github.token }}
-
   build-deb-x64:
     name: Build Linux .deb for x86_64
     if: ${{ inputs.build-deb-x64 }}
-    needs: [ validate, ensure-release ]
+    needs: validate
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -104,7 +83,7 @@ jobs:
         run: java Exec.java build linux x64 deb
       - name: Upload
         run:
-          gh release upload --clobber ${{ inputs.github-release-tag }} -R $GITHUB_REPOSITORY $(find dist/ -type f ! -name "*.sha*")
+          gh release upload --clobber ${{ inputs.github-release }} -R $GITHUB_REPOSITORY $(find dist/ -type f ! -name "*.sha*")
         env:
           GH_TOKEN: ${{ github.token }}
 
