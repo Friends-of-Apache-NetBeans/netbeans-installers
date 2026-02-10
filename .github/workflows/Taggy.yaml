@@ -23,7 +23,7 @@ jobs:
           else
             # create a release as draft. 
             # can be changed in github web ui
-            gh release create -d ${{ inputs.github-release-tag }} 
+            gh release create --draft ${{ inputs.github-release-tag }} --notes "created to ensure existence"
             echo "newly created ${{ inputs.github-release-tag }}"
           fi
         env:
