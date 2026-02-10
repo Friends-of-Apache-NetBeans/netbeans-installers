@@ -8,7 +8,7 @@ on:
       - build.properties
   push:
     paths:
-    #  - .github/workflows/*
+      - .github/workflows/*
       - Exec.java
       - build.properties
   workflow_dispatch:
