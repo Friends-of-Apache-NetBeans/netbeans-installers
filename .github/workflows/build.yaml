@@ -87,7 +87,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          cat *.deb.sha*
           gh release upload --clobber "${RELEASE_TAG}" *.deb *.yaml
 
   build-deb-arm:
@@ -123,7 +122,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          cat *.deb.sha*
           gh release upload --clobber "${RELEASE_TAG}" *.deb *.yaml
 
   build-rpm-x64:
@@ -161,7 +159,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          cat *.deb.sha*
           gh release upload --clobber "${RELEASE_TAG}" *.rpm *.yaml
 
   build-windows-x64:
@@ -220,7 +217,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./signed
         run: |
-          cat *.deb.sha*
           gh release upload --clobber "${RELEASE_TAG}" *.exe *.yaml
 
   build-macos-arm:
@@ -283,7 +279,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          cat *.deb.sha*
           gh release upload --clobber "${RELEASE_TAG}" *.pkg *.yaml
 
   build-macos-x64:
@@ -346,7 +341,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          cat *.deb.sha*
           gh release upload --clobber "${RELEASE_TAG}" *.pkg *.yaml
 
 
