@@ -116,14 +116,13 @@ jobs:
           DPKG_DEB_COMPRESSOR_TYPE: xz
         run: java Exec.java build linux arm deb
       - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-deb-arm64
-          path: |
-            dist/*.deb
-            dist/*.deb.sha*
-            dist/*.yaml
-
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        working-directory: ./dist
+        run: |
+          cat *.deb.sha*
+          gh release upload --clobber "${RELEASE_TAG}" *.deb *.yaml
 
   build-rpm-x64:
     name: Build Linux .rpm for x86_64
@@ -153,13 +152,13 @@ jobs:
       - name: Build
         run: java Exec.java build linux x64 rpm
       - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-rpm-x64
-          path: |
-            dist/*.rpm
-            dist/*.rpm.sha*
-            dist/*.yaml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        working-directory: ./dist
+        run: |
+          cat *.deb.sha*
+          gh release upload --clobber "${RELEASE_TAG}" *.rpm *.yaml
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
@@ -209,15 +208,14 @@ jobs:
       - name: Rehash
         id: rehash
         run: java Exec.java hash windows x64 innosetup signed
-      - name: Upload signed
-        id: upload-signed-artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-exe-x64
-          path: |
-            signed/*.exe
-            signed/*.exe.sha*
-            signed/*.yaml
+      - name: Upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        working-directory: ./signed
+        run: |
+          cat *.deb.sha*
+          gh release upload --clobber "${RELEASE_TAG}" *.exe *.yaml
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
@@ -272,13 +270,13 @@ jobs:
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos arm pkg
       - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-pkg-arm64
-          path: |
-            dist/*.pkg
-            dist/*.pkg.sha*
-            dist/*.yaml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        working-directory: ./dist
+        run: |
+          cat *.deb.sha*
+          gh release upload --clobber "${RELEASE_TAG}" *.pkg *.yaml
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
@@ -333,12 +331,12 @@ jobs:
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos x64 pkg
       - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-pkg-x64
-          path: |
-            dist/*.pkg
-            dist/*.pkg.sha*
-            dist/*.yaml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        working-directory: ./dist
+        run: |
+          cat *.deb.sha*
+          gh release upload --clobber "${RELEASE_TAG}" *.pkg *.yaml
 
 
