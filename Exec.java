@@ -234,18 +234,9 @@ public class Exec {
             default -> type;
         };
         String fileName=result.getFileName().toString();
-        String productIndentifier="%1$s-%2$s-%3$s".formatted(os,pckFormat,arch);
         String resultHash = Hash.SHA256.hashFile(result);
         Files.writeString(result.resolveSibling(fileName + ".sha256"),
                 resultHash + "  " + result.getFileName());
-        String webData="""
-                           %1$s-file: %2$s
-                           %1$s-hash: %3$s
-
-                           """.formatted(productIndentifier,
-                                   fileName,
-                                   resultHash );
-        Files.writeString(result.resolveSibling(fileName+ ".yaml"), webData);
     }
 
     void download(URI link, Path destination) throws IOException, InterruptedException {

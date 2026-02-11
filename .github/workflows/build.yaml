@@ -87,7 +87,7 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.deb *.yaml
+          gh release upload --clobber "${RELEASE_TAG}" *.deb
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -122,7 +122,7 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.deb *.yaml
+          gh release upload --clobber "${RELEASE_TAG}" *.deb
 
   build-rpm-x64:
     name: Build Linux .rpm for x86_64
@@ -159,7 +159,7 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.rpm *.yaml
+          gh release upload --clobber "${RELEASE_TAG}" *.rpm
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
@@ -216,7 +216,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./signed
         run: |
-          gh release upload --clobber "${{ inputs.github-release }}" *.exe *.yaml
+          gh release upload --clobber "${{ inputs.github-release }}" *.exe
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
@@ -278,7 +278,7 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.pkg *.yaml
+          gh release upload --clobber "${RELEASE_TAG}" *.pkg 
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
@@ -340,6 +340,6 @@ jobs:
           RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.pkg *.yaml
+          gh release upload --clobber "${RELEASE_TAG}" *.pkg
 
 
