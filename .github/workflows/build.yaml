@@ -53,6 +53,12 @@ jobs:
           enableCrossOsArchive: true
       - name: Validate and cache
         run: java Exec.java validate-cache
+      - name: Upload Validated Properties
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        run: |
+          gh release upload --clobber "${RELEASE_TAG}" build.properties
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
