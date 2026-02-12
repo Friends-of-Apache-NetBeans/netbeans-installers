@@ -57,7 +57,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ inputs.github-release }}" --clobber build.properties
+          gh release upload ${{ inputs.github-release }} --clobber build.properties
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
@@ -91,7 +91,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
-          gh release upload "${{ inputs.github-release }}" --clobber *.deb
+          gh release upload ${{ inputs.github-release }} --clobber *.deb
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -125,7 +125,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
-          gh release upload "${{ inputs.github-release }}" --clobber *.deb
+          gh release upload ${{ inputs.github-release }} --clobber *.deb
 
   build-rpm-x64:
     name: Build Linux .rpm for x86_64
@@ -161,7 +161,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
-          gh release upload "${{ inputs.github-release }}" --clobber *.rpm
+          gh release upload ${{ inputs.github-release }} --clobber *.rpm
           gh release upload --clobber "${RELEASE_TAG}" *.rpm
 
   build-windows-x64:
@@ -219,7 +219,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./signed
         run: |
-          gh release upload "${{ inputs.github-release }}" --clobber *.exe
+          gh release upload ${{ inputs.github-release }} --clobber *.exe
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
