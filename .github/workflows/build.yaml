@@ -56,9 +56,8 @@ jobs:
       - name: Upload Validated Properties
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" build.properties
+          gh release upload "${{ inputs.github-release }}" --clobber build.properties
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
@@ -90,10 +89,9 @@ jobs:
       - name: Upload
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.deb
+          gh release upload "${{ inputs.github-release }}" --clobber *.deb
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -125,10 +123,9 @@ jobs:
       - name: Upload
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.deb
+          gh release upload "${{ inputs.github-release }}" --clobber *.deb
 
   build-rpm-x64:
     name: Build Linux .rpm for x86_64
@@ -162,9 +159,9 @@ jobs:
       - name: Upload
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
         working-directory: ./dist
         run: |
+          gh release upload "${{ inputs.github-release }}" --clobber *.rpm
           gh release upload --clobber "${RELEASE_TAG}" *.rpm
 
   build-windows-x64:
@@ -222,7 +219,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./signed
         run: |
-          gh release upload --clobber "${{ inputs.github-release }}" *.exe
+          gh release upload "${{ inputs.github-release }}" --clobber *.exe
 
   build-macos-arm:
     name: Build macOS .pkg for arm64
@@ -278,13 +275,21 @@ jobs:
           APP_CERT_ID: ${{ vars.APP_CERT_ID }}
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos arm pkg
-      - name: Upload
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
-        working-directory: ./dist
-        run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.pkg 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-pkg-arm64
+          path: |
+            dist/*.pkg
+            dist/*.pkg.sha*
+            dist/*.yaml
+      # - name: Upload
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     RELEASE_TAG: ${{ inputs.github-release }}
+      #   working-directory: ./dist
+      #   run: |
+      #     gh release upload --clobber "${RELEASE_TAG}" *.pkg 
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
@@ -340,12 +345,21 @@ jobs:
           APP_CERT_ID: ${{ vars.APP_CERT_ID }}
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos x64 pkg
-      - name: Upload
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ inputs.github-release }}
-        working-directory: ./dist
-        run: |
-          gh release upload --clobber "${RELEASE_TAG}" *.pkg
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-pkg-x64
+          path: |
+            dist/*.pkg
+            dist/*.pkg.sha*
+            dist/*.yaml
+
+      # - name: Upload
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     RELEASE_TAG: ${{ inputs.github-release }}
+      #   working-directory: ./dist
+      #   run: |
+      #     gh release upload --clobber "${RELEASE_TAG}" *.pkg
 
 
