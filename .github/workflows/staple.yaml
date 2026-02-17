@@ -42,7 +42,8 @@ jobs:
           else
             RUN_ID=${{inputs.given-run-id}}
           fi
-          gh run download ${RUN_ID} -D dist -p "*.pkg"
+          echo "run_id= ${RUN_ID}"
+          gh run download ${RUN_ID} -D dist
       - name: Staple
         run: | 
           for mypackage in $(find dist -name "*.pkg" -type f ); do
