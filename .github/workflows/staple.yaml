@@ -1,0 +1,54 @@
+name: Staple
+on: 
+  workflow_dispatch:
+    inputs:
+      github-release: 
+        type: string
+        required: true
+        description: release to attach to, like v29-rc3-build1, v29-build1
+      which-run-id:
+        type: choice
+        required: true
+        description: how to select run-id that produced the notarized artifacts
+        options:
+          - 'latest'
+          - 'given'
+        default: 'latest'
+      given-run-id:
+        description: Build run id when 'given' is chosen. (integer value)
+        type: string
+        required: false
+
+jobs:
+  staple:
+    name: "Fetch unnotarized and staple"
+    runs-on: macos-14
+    permissions: 
+      contents: write
+    defaults:
+      run: 
+        shell: bash
+    steps: 
+      - name: fetch unnotarized files
+        id: fetch
+        run: |
+          WHICH_RUN_ID=${{ inputs.which-run-id }}
+          if [ ${WHICH_RUN_ID} == 'latest' ]; then
+            RUN_ID=$(gh run list --workflow=build.yaml --json databaseId --branch=main --limit 1 | jq -r '.[0].databaseId')
+          else
+            RUN_ID=${{inputs.given-run-id}}
+          fi
+          gh run download ${RUN_ID} -D dist -p "*.pkg"
+      - name: Staple
+        run: | 
+          for mypackage in $(find dist -name "*.pkg" -type f ); do
+            (
+              cd $(dirname ${mypackage})
+              xcrun stapler staple $(basename ${mypackage}) >> $GITHUB_OUTPUT
+            )
+          done
+      - name: Upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload --clobber "${{ inputs.github-release }}" --clobber $(find dist -type f ! -name "*.sha*")

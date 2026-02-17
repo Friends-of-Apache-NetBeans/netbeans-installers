@@ -279,18 +279,22 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-pkg-arm64
+          name: macos-pkg-arm64-unnotarized
           path: |
             dist/*.pkg
-            dist/*.pkg.sha*
-            dist/*.yaml
-      # - name: Upload
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     RELEASE_TAG: ${{ inputs.github-release }}
-      #   working-directory: ./dist
-      #   run: |
-      #     gh release upload --clobber "${RELEASE_TAG}" *.pkg 
+      - name: Notarize
+          # upload and start notarization but do not wait for result
+        env:
+          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ vars.APPLE_ID }}
+          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        run: |
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "signer" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" \
+             --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
+          mypackage=$(find dist/ -name "*.pkg" -maxdepth 1 -type f)
+          echo "Notarize app ${mypackage}"
+          xcrun notarytool submit ${mypackage} --keychain-profile "signer" --no-wait >> $GITHUB_OUTPUT
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
@@ -349,18 +353,21 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-pkg-x64
+          name: macos-pkg-x64-unnotarized
           path: |
             dist/*.pkg
-            dist/*.pkg.sha*
-            dist/*.yaml
+      - name: Notarize
+        env:
+          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ vars.APPLE_ID }}
+          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        run: |
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "signer" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" \
+             --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
+          mypackage=$(find dist/ -name "*.pkg" -maxdepth 1 -type f)
+          echo "Notarize app ${mypackage}"
+          xcrun notarytool submit ${mypackage} --keychain-profile "signer" --no-wait >> $GITHUB_OUTPUT
 
-      # - name: Upload
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     RELEASE_TAG: ${{ inputs.github-release }}
-      #   working-directory: ./dist
-      #   run: |
-      #     gh release upload --clobber "${RELEASE_TAG}" *.pkg
 
 
