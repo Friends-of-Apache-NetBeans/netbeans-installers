@@ -367,7 +367,7 @@ jobs:
              --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
           mypackage=$(find dist/ -name "*.pkg" -maxdepth 1 -type f)
           echo "Notarize app ${mypackage}"
-          xcrun notarytool submit ${mypackage} --keychain-profile "signer" --no-wait >> $GITHUB_OUTPUT
+          xcrun notarytool submit ${mypackage} --keychain-profile "signer" --no-wait
 
 
 
