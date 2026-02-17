@@ -292,9 +292,9 @@ jobs:
           echo "Create keychain profile"
           xcrun notarytool store-credentials "signer" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" \
              --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
-          mypackage=$(find dist/ -name "*.pkg" -maxdepth 1 -type f)
+          mypackage=$(find dist -name "*.pkg" -maxdepth 1 -type f)
           echo "Notarize app ${mypackage}"
-          xcrun notarytool submit ${mypackage} --keychain-profile "signer" --no-wait >> $GITHUB_OUTPUT
+          xcrun notarytool submit ${mypackage} --keychain-profile "signer" --no-wait
 
   build-macos-x64:
     name: Build macOS .pkg for x86_64
