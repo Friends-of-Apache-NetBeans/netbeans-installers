@@ -31,6 +31,8 @@ jobs:
     steps: 
       - name: fetch unnotarized files
         id: fetch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           WHICH_RUN_ID=${{ inputs.which-run-id }}
           if [ ${WHICH_RUN_ID} == 'latest' ]; then
