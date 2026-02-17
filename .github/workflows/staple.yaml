@@ -49,7 +49,7 @@ jobs:
           for mypackage in $(find dist -name "*.pkg" -type f ); do
             (
               cd $(dirname ${mypackage})
-              xcrun stapler staple $(basename ${mypackage}) >> $GITHUB_OUTPUT
+              xcrun stapler staple $(basename ${mypackage})
             )
           done
       - name: Upload
