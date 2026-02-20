@@ -21,13 +21,10 @@ on:
       build-macos-x64:
         description: 'Build macOS .pkg for x86_64'
         type: boolean
-      netbeans-release:
-        description: 'release name as in 27 or 28-rc3'
-        type: string
       github-release: 
         description: |
           github release tag like v29-rc2-build1.
-          NOTE: the release must be based on an existing tag.
+          NOTE: the release must exist and be based on an existing tag.
         type: string
 
 jobs:
