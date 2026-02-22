@@ -209,9 +209,6 @@ jobs:
           wait-for-completion-timeout-in-seconds: 86400
           wait-for-completion: true
           output-artifact-directory: signed
-      - name: Rehash
-        id: rehash
-        run: java Exec.java hash windows x64 innosetup signed
       - name: Upload
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
