@@ -26,7 +26,7 @@ import java.util.stream.*;
 /**
  * Source file for use in workflows for downloading and building installers.
  *
- * Usage: 
+ * Usage:
  *
  * <ul>
  * <li>{@code java Exec.java build os arch package-type}</li>
@@ -312,7 +312,9 @@ public class Exec {
         }
         System.out.println("Loading Configuration");
         Properties config = new Properties();
-        try (Reader configReader = Files.newBufferedReader(workingDir.resolve("build.properties"))) {
+        // allow for different properties, selectable via actions menu.
+        String buildProperties = System.getenv().getOrDefault("BUILD_PROPERTIES", "build.properties");
+        try (Reader configReader = Files.newBufferedReader(workingDir.resolve(buildProperties))) {
             config.load(configReader);
         }
         config.entrySet().stream()
