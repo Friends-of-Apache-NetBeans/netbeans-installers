@@ -3,6 +3,25 @@ name: Build
 on:
   workflow_dispatch:
     inputs:
+      netbeans-properties: 
+        description: | 
+          Provide the netbeans properties-file for this build. 
+          Defaults to the value netbeans.properties in 'build.properties'
+          If the file does not exist, the default is used.
+          example: zulu-25.properties
+        type: string
+        default: build.properties
+      jdk-properties: 
+        description: | 
+          Provide the jdk properties file for this build. 
+          Defaults to the value jdk.properties in 'build.properties'
+          If the file does not exist, the default is used.
+        type: string
+        default: build.properties
+      sign-artifacts: 
+        description: set to sign the windows and macos artifacts.
+        type: boolean
+        default: false
       build-deb-x64:
         description: 'Build Linux .deb for x86_64'
         type: boolean
@@ -23,7 +42,7 @@ on:
         type: boolean
       github-release: 
         description: |
-          github release tag like v29-rc2-build1.
+          github release tag like v29-zulu-25.
           NOTE: the release must exist and be based on an existing tag.
         type: string
 
@@ -48,15 +67,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', inputs.build-properties ) }}
           enableCrossOsArchive: true
       - name: Validate and cache
         run: java Exec.java validate-cache
       - name: Upload Validated Properties
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
         run: |
-          gh release upload ${{ inputs.github-release }} --clobber build.properties
+          gh release upload ${{ inputs.github-release }} --clobber ${{inputs.build-properties}}
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
@@ -84,6 +104,7 @@ jobs:
       - name: Build
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
         run: java Exec.java build linux x64 deb
       - name: Upload
         env:
@@ -118,6 +139,7 @@ jobs:
       - name: Build
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
         run: java Exec.java build linux arm deb
       - name: Upload
         env:
@@ -154,6 +176,8 @@ jobs:
           sudo apt update
           sudo apt install rpm
       - name: Build
+        env:
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
         run: java Exec.java build linux x64 rpm
       - name: Upload
         env:
@@ -188,6 +212,7 @@ jobs:
       - name: Build
         env:
           INNOSETUP_PATH: 'C:\\Program Files (x86)\\Inno Setup 6\\iscc.exe'
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
         run: java Exec.java build windows x64 innosetup
       - name: Upload unsigned
         id: upload-unsigned-artifact
@@ -267,6 +292,7 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN_PATH"
       - name: Build
         env:
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
           APP_CERT_ID: ${{ vars.APP_CERT_ID }}
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos arm pkg
@@ -341,6 +367,7 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN_PATH"
       - name: Build
         env:
+          BUILD_PROPERTIES: ${{inputs.build-properties}}
           APP_CERT_ID: ${{ vars.APP_CERT_ID }}
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos x64 pkg
