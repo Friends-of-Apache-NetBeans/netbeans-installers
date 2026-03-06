@@ -21,6 +21,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.security.*;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.*;
 
 /**
@@ -38,6 +39,7 @@ public class Exec {
 
     private static final String COMMAND_BUILD = "build";
     private static final String COMMAND_VALIDATE = "validate";
+    private static final String COMMAND_SHOW_CONFIG = "show";
     private static final String COMMAND_VALIDATE_DOWNLOADS = "validate-downloads";
     private static final String COMMAND_VALIDATE_CACHE = "validate-cache";
     private static final String COMMAND_HASH = "hash";
@@ -228,12 +230,10 @@ public class Exec {
             default ->
                 throw new IllegalStateException();
         };
-        String pckFormat= switch(type){
-            case "deb","rpm","pkg" -> type;
-            case "innosetup" -> "exe";
-            default -> type;
-        };
-        String fileName=result.getFileName().toString();
+
+        String jdkVariant = config.getProperty("jdk.variant", "");
+        result = insertJDKVariant(result, jdkVariant);
+        String fileName = result.getFileName().toString();
         String resultHash = Hash.SHA256.hashFile(result);
         Files.writeString(result.resolveSibling(fileName + ".sha256"),
                 resultHash + "  " + result.getFileName());
@@ -266,7 +266,7 @@ public class Exec {
 
         final String command;
         final String os, arch, type;
-        Path distDir= Path.of("");
+        Path distDir = Path.of("");
 
         String cmd = args.length == 0 ? COMMAND_VALIDATE : args[0];
         switch (cmd) {
@@ -283,15 +283,26 @@ public class Exec {
                 os = arch = type = null;
                 command = cmd;
             }
-            case COMMAND_HASH ->{
+            case COMMAND_HASH -> {
                 if (args.length != 5) {
                     throw new IllegalArgumentException("Usage : hash <os> <arch> <package-type> <dist-dir>");
                 }
                 os = args[1];
                 arch = args[2];
                 type = args[3];
-                distDir = Path.of( args[4] );
+                distDir = Path.of(args[4]);
                 command = cmd;
+            }
+            case COMMAND_SHOW_CONFIG -> {
+                if (args.length != 4) {
+                    throw new IllegalArgumentException("Usage : hash <os> <arch> <package-type> <dist-dir>");
+                }
+                os = args[1];
+                arch = args[2];
+                type = args[3];
+                command = cmd;
+                loadConfig(distDir);
+                System.exit(0);
             }
             default ->
                 throw new IllegalArgumentException("Unknown command : " + cmd);
@@ -310,17 +321,7 @@ public class Exec {
             System.out.println("Creating cache directory");
             Files.createDirectory(cacheDir);
         }
-        System.out.println("Loading Configuration");
-        Properties config = new Properties();
-        // allow for different properties, selectable via actions menu.
-        String buildProperties = System.getenv().getOrDefault("BUILD_PROPERTIES", "build.properties");
-        try (Reader configReader = Files.newBufferedReader(workingDir.resolve(buildProperties))) {
-            config.load(configReader);
-        }
-        config.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getKey().toString()))
-                .forEach(e -> System.out.println(" - " + e.getKey() + " : " + e.getValue()));
-
+        Properties config = loadConfig(workingDir);
         Exec exec = new Exec(workingDir, cacheDir, config, os, arch, type);
 
         switch (command) {
@@ -341,9 +342,73 @@ public class Exec {
             case COMMAND_HASH -> {
                 exec.processAndHashOutput(distDir);
             }
+            case COMMAND_SHOW_CONFIG -> {
+                loadConfig(workingDir);
+                System.exit(0);
+            }
         }
 
         System.out.println("OK - Exiting");
+    }
+
+    /**
+     * Loads the configuration file(s).
+     *
+     * Read the configuration from on or more property files. The first
+     * properties file to be read is {@code env.BUILD_PROPERTIES} which defaults
+     * to {@code build.properties}. These properties are inspected for values
+     * that regex match ".+\\.properties". Each such value is interpreted as an
+     * extra set of properties to be read from the match as file name.
+     *
+     * After that the {@code env} is expected for two values:
+     * NETBEANS_PROPERTIES and JDK_PROPERTIES. For each of the latter that is
+     * not null nor blank, a properties file is read with the value as name.
+     *
+     * This allows to override JDK and NETBEANS settings in either the build
+     * script of the environment there of.
+     *
+     * @param workingDir sic
+     * @return the complete config
+     * @throws IOException
+     */
+    static Properties loadConfig(Path workingDir) throws IOException {
+        System.out.println("Loading Configuration");
+        Properties config = new Properties();
+        // allow for different properties, selectable via actions menu.
+        String buildProperties = System.getenv().getOrDefault("BUILD_PROPERTIES", "build.properties");
+        try (Reader configReader = Files.newBufferedReader(workingDir.resolve(buildProperties))) {
+            config.load(configReader);
+        }
+
+        List<String> extraProps = new ArrayList<>();
+        for (Object value : config.values()) {
+            if (value.toString().matches((".+\\.properties"))) {
+                extraProps.add(value.toString());
+            }
+        }
+        for (String extraProp : extraProps) {
+            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(extraProp))) {
+                config.load(configReader);
+            }
+        }
+        String netbeansProps = System.getenv().get("NETBEANS_PROPERTIES");
+        if (netbeansProps != null && !netbeansProps.isBlank()) {
+            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(netbeansProps))) {
+                config.load(configReader);
+            }
+        }
+
+        String jdkProps = System.getenv().get("JDK_PROPERTIES");
+        if (jdkProps != null && !jdkProps.isBlank()) {
+            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(jdkProps))) {
+                config.load(configReader);
+            }
+        }
+
+        config.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey().toString()))
+                .forEach(e -> System.out.println(" - " + e.getKey() + " : " + e.getValue()));
+        return config;
     }
 
     enum Hash {
@@ -408,4 +473,42 @@ public class Exec {
             }
         }
     }
+
+    Pattern packageNamePattern = Pattern.compile("^(?<prefix>.*?)((?<archSep>[\\.\\-_])?(?<arch>x86_64|arm64|amd64))?(?<ext>\\.(exe|pkg|deb|rpm))$");
+
+    /**
+     * Insert JDK-variant into file name.
+     *
+     * @param orgFile input
+     * @param variant to use
+     * @return the filename with variant inserted e.g.
+     * {@code file.exe -> file-variant.exe}
+     */
+    Path insertJDKVariant(Path orgFile, String variant) throws IOException {
+        var matcher = packageNamePattern.matcher(orgFile.getFileName().toString());
+        Path result = orgFile;
+        if (variant == null || variant.isBlank()) {
+            return result;
+        }
+        if (matcher.matches()) {
+            int groupCount = matcher.groupCount();
+
+            var prefix = matcher.group("prefix");
+            var arch = matcher.group("arch");
+            var archSep = matcher.group("archSep");
+            var ext = matcher.group("ext");
+            arch = arch == null ? "" : arch;
+            arch = arch != null ? arch : "";
+            String resultName
+                    = switch (ext) {
+                case ".exe" ->
+                    prefix + '-' + variant + ext;
+                default ->
+                    prefix + archSep + variant + archSep + arch + ext;
+            };
+            result = Files.move(result, result.resolveSibling(resultName));
+        }
+        return result;
+    }
+
 }
