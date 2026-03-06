@@ -12,7 +12,16 @@ jobs:
     name: Show config
     runs-on: ubuntu-24.04
     steps:
-      - name: step1
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: 'zulu'
+      - name: show
         env: 
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: java Exec.java show linux x86_64 deb
