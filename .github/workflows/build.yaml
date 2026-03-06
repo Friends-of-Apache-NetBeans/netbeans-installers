@@ -8,16 +8,21 @@ on:
           Provide the netbeans properties-file for this build. 
           Defaults to the value netbeans.properties in 'build.properties'
           If the file does not exist, the default is used.
-          example: zulu-25.properties
+          example: nb-30-rc1.properties
         type: string
-        default: build.properties
       jdk-properties: 
         description: | 
           Provide the jdk properties file for this build. 
           Defaults to the value jdk.properties in 'build.properties'
           If the file does not exist, the default is used.
+          example: zulu-25.properties
         type: string
-        default: build.properties
+      github-release: 
+        description: |
+          github release tag like v29-zulu-25.
+          NOTE: the release must exist and be based on an existing tag.
+        type: string
+        required: true
       sign-artifacts: 
         description: set to sign the windows and macos artifacts.
         type: boolean
@@ -40,11 +45,6 @@ on:
       build-macos-x64:
         description: 'Build macOS .pkg for x86_64'
         type: boolean
-      github-release: 
-        description: |
-          github release tag like v29-zulu-25.
-          NOTE: the release must exist and be based on an existing tag.
-        type: string
 
 jobs:
   
