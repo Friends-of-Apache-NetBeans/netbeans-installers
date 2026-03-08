@@ -5,24 +5,23 @@ on:
     inputs:
       netbeans-properties: 
         description: | 
-          Provide the netbeans properties-file for this build. 
+          Provide the netbeans properties-name for this build.
           Defaults to the value netbeans.properties in 'build.properties'
-          If the file does not exist, the default is used.
-          example: nb-30-rc1.properties
+          example: 'nb30-rc1'
         type: string
       jdk-properties: 
         description: | 
-          Provide the jdk properties file for this build. 
+          Provide the jdk properties-name for this build. 
           Defaults to the value jdk.properties in 'build.properties'
-          If the file does not exist, the default is used.
-          example: zulu-25.properties
+          example: zulu-25
         type: string
       github-release: 
         description: |
-          github release tag like v29-zulu-25.
-          NOTE: the release must exist and be based on an existing tag.
+          GitHub release tag to upload to, like 'nb29-zulu-25'.
+          If not given, the aritfacts will not be uploaded to a release.
+          NOTE: If given, the release must exist.
         type: string
-        required: true
+        required: false
       sign-artifacts: 
         description: set to sign the windows and macos artifacts.
         type: boolean
@@ -58,6 +57,35 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Validate release tag
+        if: ${{ inputs.github-release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.github-release }}
+        run: |
+          if ! gh release view "${RELEASE_TAG}" &> /dev/null;
+            then
+              echo "Release ${RELEASE_TAG} does not exist"
+              exit 1
+          fi          
+      - name: Validate netbeans.properties
+        if: ${{ inputs.netbeans-properties }}
+        env:
+          NETBEANS_PROPERTIES: ${{ inputs.netbeans-properties }}
+        run: |
+          if [ ! -e  "${NETBEANS_PROPERTIES}.properties" ]; then
+              echo "netbeans properties file ${NETBEANS_PROPERTIES}.properties does not exist"
+              exit 1
+          fi          
+      - name: Validate jdk.properties
+        if: ${{ inputs.jdk-properties }}
+        env:
+          JDK_PROPERTIES: ${{ inputs.jdk-properties }}
+        run: |
+          if [ ! -e  "${JDK_PROPERTIES}.properties" ]; then
+              echo "netbeans properties file ${JDK_PROPERTIES}.properties does not exist"
+              exit 1
+          fi          
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
@@ -67,16 +95,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', inputs.build-properties ) }}
+          key: ${{ hashFiles('Exec.java', '*.properties' ) }}
           enableCrossOsArchive: true
       - name: Validate and cache
         run: java Exec.java validate-cache
       - name: Upload Validated Properties
+        if: ${{inputs.github-release}}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: |
-          gh release upload ${{ inputs.github-release }} --clobber ${{inputs.build-properties}}
+          cat ${NETBEANS_PROPERTIES} ${JDK_PROPERTIES} > build.properties
+          gh release upload ${{ inputs.github-release }} --clobber build.properties
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
@@ -99,19 +130,30 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
       - name: Build
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: java Exec.java build linux x64 deb
-      - name: Upload
+      - name: Upload to release
+        if: ${{ inputs.github-release }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
           gh release upload ${{ inputs.github-release }} --clobber *.deb
+      - name: Upload to workflow
+        if: ${{! inputs.github-release }}
+        uses: actions/upload-artifact@v7
+        with: 
+          name: linux-deb-x64
+          path: |
+            dist/*.deb
+            dist/*.deb.sha
+
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -134,19 +176,29 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
       - name: Build
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.netbeans-properties}}
         run: java Exec.java build linux arm deb
       - name: Upload
+        if: ${{ inputs.github-release }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
           gh release upload ${{ inputs.github-release }} --clobber *.deb
+      - name: Upload to workflow
+        if: ${{! inputs.github-release }}
+        uses: actions/upload-artifact@v7
+        with: 
+          name: linux-deb-arm64
+          path: |
+            dist/*.deb
+            dist/*.deb.sha
 
   build-rpm-x64:
     name: Build Linux .rpm for x86_64
@@ -169,7 +221,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
       - name: Install RPM tools
         run: |
@@ -177,14 +229,24 @@ jobs:
           sudo apt install rpm
       - name: Build
         env:
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: java Exec.java build linux x64 rpm
       - name: Upload
+        if: ${{inputs.github-release}}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
           gh release upload ${{ inputs.github-release }} --clobber *.rpm
+      - name: Upload to workflow
+        if: ${{! inputs.github-release }}
+        uses: actions/upload-artifact@v7
+        with: 
+          name: linux-rpm-x64
+          path: |
+            dist/*.rpm
+            dist/*.rpm.sha
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
@@ -207,21 +269,24 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
       - name: Build
         env:
           INNOSETUP_PATH: 'C:\\Program Files (x86)\\Inno Setup 6\\iscc.exe'
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: java Exec.java build windows x64 innosetup
-      - name: Upload unsigned
+      - name: Upload unsigned to workflow
         id: upload-unsigned-artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows-exe-x64-unsigned
           path: |
             dist/*.exe
+            dist/*.exe.sha
       - name: Sign with signpath
+        if: ${{ inputs.sign-artifacts }}
         id: signing
         uses: signpath/github-action-submit-signing-request@v1
         with:
@@ -234,10 +299,18 @@ jobs:
           wait-for-completion-timeout-in-seconds: 86400
           wait-for-completion: true
           output-artifact-directory: signed
-      - name: Upload
+      - name: Upload to release
+        if: ${{ inputs.github-release && inputs.sign-artifacts }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./signed
+        run: |
+          gh release upload ${{ inputs.github-release }} --clobber *.exe
+      - name: Upload unsigned to release
+        if: ${{ inputs.github-release && ! inputs.sign-artifacts }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ./dist
         run: |
           gh release upload ${{ inputs.github-release }} --clobber *.exe
 
@@ -265,7 +338,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
       - name: Install certificates
         if: ${{ vars.APP_CERT_ID }}
@@ -292,12 +365,13 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN_PATH"
       - name: Build
         env:
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
           APP_CERT_ID: ${{ vars.APP_CERT_ID }}
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos arm pkg
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload to workflow
+        uses: actions/upload-artifact@v7
         with:
           name: macos-pkg-arm64-unnotarized
           path: |
@@ -340,7 +414,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: cache
-          key: ${{ hashFiles('Exec.java', 'build.properties') }}
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
       - name: Install certificates
         if: ${{ vars.APP_CERT_ID }}
@@ -367,7 +441,8 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN_PATH"
       - name: Build
         env:
-          BUILD_PROPERTIES: ${{inputs.build-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
           APP_CERT_ID: ${{ vars.APP_CERT_ID }}
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos x64 pkg

@@ -392,15 +392,19 @@ public class Exec {
             }
         }
         String netbeansProps = System.getenv().get("NETBEANS_PROPERTIES");
-        if (netbeansProps != null && !netbeansProps.isBlank()) {
-            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(netbeansProps))) {
+        if (netbeansProps != null 
+                && !netbeansProps.isBlank()
+                && Files.isRegularFile(workingDir.resolve(netbeansProps+".properties"))) {
+            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(netbeansProps+".properties"))) {
                 config.load(configReader);
             }
         }
 
         String jdkProps = System.getenv().get("JDK_PROPERTIES");
-        if (jdkProps != null && !jdkProps.isBlank()) {
-            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(jdkProps))) {
+        if (jdkProps != null
+                && !jdkProps.isBlank()
+                && Files.isRegularFile(workingDir.resolve(jdkProps+".properties"))) {
+            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(jdkProps+".properties"))) {
                 config.load(configReader);
             }
         }
