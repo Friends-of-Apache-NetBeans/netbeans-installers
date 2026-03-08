@@ -182,7 +182,7 @@ jobs:
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
           NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
-          JDK_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: java Exec.java build linux arm deb
       - name: Upload
         if: ${{ inputs.github-release }}
