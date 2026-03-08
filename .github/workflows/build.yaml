@@ -106,7 +106,7 @@ jobs:
           NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: |
-          cat ${NETBEANS_PROPERTIES} ${JDK_PROPERTIES} > build.properties
+          cat ${NETBEANS_PROPERTIES}.properties ${JDK_PROPERTIES}.properties > build.properties
           gh release upload ${{ inputs.github-release }} --clobber build.properties
 
   build-deb-x64:
