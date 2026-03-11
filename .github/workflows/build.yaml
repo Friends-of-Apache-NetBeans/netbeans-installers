@@ -288,7 +288,7 @@ jobs:
       - name: Sign with signpath
         if: ${{ inputs.sign-artifacts }}
         id: signing
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: '${{ secrets.SIGNPATH_SIGNER_TOKEN }}'
           organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
