@@ -21,6 +21,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.security.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.*;
 
@@ -77,7 +78,10 @@ public class Exec {
         Path nbpackage = configureNBPackage();
         Path pkgConfig = workingDir.resolve("config")
                 .resolve(os + "-" + arch + "-" + type + ".properties");
-        Path jdk = resource("jdk." + os + "." + arch);
+        Path jdk=null;
+        if (!config.get("jdk.variant").equals("none")) {
+            jdk = resource("jdk." + os + "." + arch);
+        }
         Path netbeans = resource("netbeans");
         Path dist = Files.createDirectories(workingDir.resolve("dist"));
 
@@ -199,7 +203,9 @@ public class Exec {
         cmd.add("--config");
         cmd.add(pkgConfig.toString());
         cmd.add("-Pversion=" + version);
-        cmd.add("-Pruntime=" + jdk.toString());
+        if (!config.getProperty("jdk.variant").equals("none")) {
+            cmd.add("-Pruntime=" + jdk.toString());
+        }
         if (type.equals("innosetup")) {
             cmd.add("-Pinnosetup.tool=" + System.getenv("INNOSETUP_PATH"));
         } else if (type.equals("pkg")) {
@@ -294,12 +300,7 @@ public class Exec {
                 command = cmd;
             }
             case COMMAND_SHOW_CONFIG -> {
-                if (args.length != 4) {
-                    throw new IllegalArgumentException("Usage : hash <os> <arch> <package-type> <dist-dir>");
-                }
-                os = args[1];
-                arch = args[2];
-                type = args[3];
+                os = arch = type = null;
                 command = cmd;
                 loadConfig(distDir);
                 System.exit(0);
@@ -408,11 +409,19 @@ public class Exec {
                 config.load(configReader);
             }
         }
-
+        Comparator<Entry<Object,Object>> comp = Comparator.comparing(e -> e.getKey().toString());
+        Comparator<Entry<Object, Object>> reversed = comp.reversed();
         config.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getKey().toString()))
+                .sorted(reversed)
                 .forEach(e -> System.out.println(" - " + e.getKey() + " : " + e.getValue()));
-        return config;
+        var effectiveProps=config.entrySet().stream()
+                .sorted(reversed)
+                .map(e -> e.getKey().toString()+"="+ e.getValue().toString())
+                .toList();
+       Path effectivePropFile= workingDir.resolve(Path.of("dist","effective.properties"));
+       Files.createDirectories(effectivePropFile.getParent());
+       Files.write(effectivePropFile, effectiveProps);
+       return config;
     }
 
     enum Hash {
