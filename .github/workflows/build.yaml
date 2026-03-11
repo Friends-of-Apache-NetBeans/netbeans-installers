@@ -106,7 +106,7 @@ jobs:
           NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: |
-          gh release upload ${{ inputs.github-release }} --clobber effective.properties
+          gh release upload ${{ inputs.github-release }} --clobber dist/effective.properties
 
   build-deb-x64:
     name: Build Linux .deb for x86_64
