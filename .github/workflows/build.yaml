@@ -446,7 +446,7 @@ jobs:
           INST_CERT_ID: ${{ vars.INST_CERT_ID }}
         run: java Exec.java build macos x64 pkg
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos-pkg-x64-unnotarized
           path: |
