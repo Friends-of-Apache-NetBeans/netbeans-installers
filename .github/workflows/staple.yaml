@@ -21,7 +21,7 @@ on:
 
 jobs:
   staple:
-    name: "Fetch unnotarized and staple"
+    name: "Fetch notarized package and staple"
     runs-on: macos-14
     permissions: 
       contents: write
