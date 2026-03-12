@@ -506,7 +506,7 @@ public class Exec {
     Path insertJDKVariant(Path orgFile, String variant) throws IOException {
         var matcher = packageNamePattern.matcher(orgFile.getFileName().toString());
         Path result = orgFile;
-        if (variant == null || variant.isBlank()) {
+        if (variant == null || variant.isBlank() || variant.equals("none")) {
             return result;
         }
         if (matcher.matches()) {
