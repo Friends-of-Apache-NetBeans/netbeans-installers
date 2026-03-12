@@ -405,6 +405,12 @@ public class Exec {
         if (jdkProps != null
                 && !jdkProps.isBlank()
                 && Files.isRegularFile(workingDir.resolve(jdkProps+".properties"))) {
+            // first drop all jdk properties
+            List<Entry<Object, Object>> toList = config.entrySet().stream().filter(e -> e.toString().startsWith("jdk."))
+                    .toList();
+            for (Entry<Object, Object> entry : toList) {
+                config.remove(entry.getKey());
+            }
             try (Reader configReader = Files.newBufferedReader(workingDir.resolve(jdkProps+".properties"))) {
                 config.load(configReader);
             }
