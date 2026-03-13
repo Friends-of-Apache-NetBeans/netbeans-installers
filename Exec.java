@@ -384,11 +384,13 @@ public class Exec {
         var envProps = List.of("NETBEANS_PROPERTIES", "JDK_PROPERTIES");
         for (String envProp : envProps) {
             // strip .properties to be lenient toward end with .properties ending or without.
-            String envPropFile = System.getenv().get(envProp).replaceFirst(".properties", "") + ".properties";
-            if (envProp != null
-                    && !envProp.isBlank()
-                    && Files.isRegularFile(workingDir.resolve(envPropFile))) {
-                System.out.println(" - picking up env "+envProp
+            String s = System.getenv().get(envProp);
+            if (s == null) {
+                continue;
+            }
+            String envPropFile = s.replaceFirst(".properties", "") + ".properties";
+            if ( !envProp.isBlank() && Files.isRegularFile(workingDir.resolve(envPropFile))) {
+                System.out.println(" - picking up env " + envProp
                         + " property file = " + envPropFile);
                 config.setProperty(envProp.replaceAll("\\_", ".").toLowerCase(), envPropFile);
             }
@@ -408,7 +410,7 @@ public class Exec {
                 .sorted(reversed)
                 .map(e -> e.getKey().toString() + "=" + e.getValue().toString()).toList();
         System.out.println("effective properties: ");
-        effectiveProps.forEach(e -> System.out.println(" - " + e ));
+        effectiveProps.forEach(e -> System.out.println(" - " + e));
         Path effectivePropFile = workingDir1.resolve(Path.of("dist", "effective.properties"));
         Files.createDirectories(effectivePropFile.getParent());
         Files.write(effectivePropFile, effectiveProps);
