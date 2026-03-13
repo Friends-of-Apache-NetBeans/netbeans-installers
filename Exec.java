@@ -78,7 +78,7 @@ public class Exec {
         Path nbpackage = configureNBPackage();
         Path pkgConfig = workingDir.resolve("config")
                 .resolve(os + "-" + arch + "-" + type + ".properties");
-        Path jdk=null;
+        Path jdk = null;
         if (!config.get("jdk.variant").equals("none")) {
             jdk = resource("jdk." + os + "." + arch);
         }
@@ -380,7 +380,52 @@ public class Exec {
         try (Reader configReader = Files.newBufferedReader(workingDir.resolve(buildProperties))) {
             config.load(configReader);
         }
+        // amend config with env.
+        var envProps = List.of("NETBEANS_PROPERTIES", "JDK_PROPERTIES");
+        for (String envProp : envProps) {
+            // strip .properties to be lenient toward end with .properties ending or without.
+            String envPropFile = System.getenv().get(envProp).replaceFirst(".properties", "") + ".properties";
+            if (envProp != null
+                    && !envProp.isBlank()
+                    && Files.isRegularFile(workingDir.resolve(envPropFile))) {
+                System.out.println(" - picking up env "+envProp
+                        + " property file = " + envPropFile);
+                config.setProperty(envProp.replaceAll("\\_", ".").toLowerCase(), envPropFile);
+            }
+        }
 
+        // load extra properties from amended config
+        config = loadExtraProperties(config, workingDir);
+        writeEffectiveProperties(config, workingDir);
+        return config;
+    }
+
+    static void writeEffectiveProperties(Properties config1, Path workingDir1) throws IOException {
+        Comparator<Entry<Object, Object>> comp = Comparator.comparing(e -> e.getKey().toString());
+        Comparator<Entry<Object, Object>> reversed = comp.reversed();
+        java.util.List<java.lang.String> effectiveProps = config1.entrySet()
+                .stream()
+                .sorted(reversed)
+                .map(e -> e.getKey().toString() + "=" + e.getValue().toString()).toList();
+        System.out.println("effective properties: ");
+        effectiveProps.forEach(e -> System.out.println(" - " + e ));
+        Path effectivePropFile = workingDir1.resolve(Path.of("dist", "effective.properties"));
+        Files.createDirectories(effectivePropFile.getParent());
+        Files.write(effectivePropFile, effectiveProps);
+    }
+
+    /**
+     * Read properties from files that are the values to keys ending with
+     * {@code ".property"}.
+     *
+     * Inspect config for values of the shape {@code ".+*\\.properties"}; for
+     * each such value try to load the associated properties into config.
+     *
+     * @param config to supplement
+     * @param workingDir from which to read properties.
+     * @throws IOException
+     */
+    static Properties loadExtraProperties(Properties config, Path workingDir) throws IOException {
         List<String> extraProps = new ArrayList<>();
         for (Object value : config.values()) {
             if (value.toString().matches((".+\\.properties"))) {
@@ -392,42 +437,7 @@ public class Exec {
                 config.load(configReader);
             }
         }
-        String netbeansProps = System.getenv().get("NETBEANS_PROPERTIES");
-        if (netbeansProps != null 
-                && !netbeansProps.isBlank()
-                && Files.isRegularFile(workingDir.resolve(netbeansProps+".properties"))) {
-            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(netbeansProps+".properties"))) {
-                config.load(configReader);
-            }
-        }
-
-        String jdkProps = System.getenv().get("JDK_PROPERTIES");
-        if (jdkProps != null
-                && !jdkProps.isBlank()
-                && Files.isRegularFile(workingDir.resolve(jdkProps+".properties"))) {
-            // first drop all jdk properties
-            List<Entry<Object, Object>> toList = config.entrySet().stream().filter(e -> e.toString().startsWith("jdk."))
-                    .toList();
-            for (Entry<Object, Object> entry : toList) {
-                config.remove(entry.getKey());
-            }
-            try (Reader configReader = Files.newBufferedReader(workingDir.resolve(jdkProps+".properties"))) {
-                config.load(configReader);
-            }
-        }
-        Comparator<Entry<Object,Object>> comp = Comparator.comparing(e -> e.getKey().toString());
-        Comparator<Entry<Object, Object>> reversed = comp.reversed();
-        config.entrySet().stream()
-                .sorted(reversed)
-                .forEach(e -> System.out.println(" - " + e.getKey() + " : " + e.getValue()));
-        var effectiveProps=config.entrySet().stream()
-                .sorted(reversed)
-                .map(e -> e.getKey().toString()+"="+ e.getValue().toString())
-                .toList();
-       Path effectivePropFile= workingDir.resolve(Path.of("dist","effective.properties"));
-       Files.createDirectories(effectivePropFile.getParent());
-       Files.write(effectivePropFile, effectiveProps);
-       return config;
+        return config;
     }
 
     enum Hash {
