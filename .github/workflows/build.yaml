@@ -98,13 +98,14 @@ jobs:
           key: ${{ hashFiles('Exec.java', '*.properties' ) }}
           enableCrossOsArchive: true
       - name: Validate and cache
+        env: 
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: java Exec.java validate-cache
       - name: Upload Validated Properties
         if: ${{inputs.github-release}}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
-          JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: |
           gh release upload ${{ inputs.github-release }} --clobber dist/effective.properties
 

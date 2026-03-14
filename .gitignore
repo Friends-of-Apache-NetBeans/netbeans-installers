@@ -7,3 +7,5 @@ nbpackage/
 .env
 artifacts/
 dist/
+/exec/nbproject/private/
+/exec/build/
