@@ -6,6 +6,9 @@ on:
       jdk-properties:
         description: the properties file-name for the jdk to bundle
         type: string
+      netbeans-properties:
+        description: the properties file-name for netbeans to bundle
+        type: string
 
 jobs:
   show:
@@ -24,4 +27,5 @@ jobs:
       - name: show
         env: 
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
         run: java Exec.java show linux x86_64 deb
