@@ -300,10 +300,10 @@ public class Exec {
                 command = cmd;
             }
             case COMMAND_SHOW_CONFIG -> {
-                os = arch = type = null;
+                os = args.length > 1 ? args[1] : "unspecified";
+                arch = args.length > 2 ? args[2] : "unspecified";
+                type = args.length > 3 ? args[3] : "unspecified";
                 command = cmd;
-                loadConfig(distDir);
-                System.exit(0);
             }
             default ->
                 throw new IllegalArgumentException("Unknown command : " + cmd);
@@ -344,8 +344,7 @@ public class Exec {
                 exec.processAndHashOutput(distDir);
             }
             case COMMAND_SHOW_CONFIG -> {
-                loadConfig(workingDir);
-                System.exit(0);
+                // nothing to do, show work is always done
             }
         }
 
@@ -389,7 +388,7 @@ public class Exec {
                 continue;
             }
             String envPropFile = s.replaceFirst(".properties", "") + ".properties";
-            if ( !envProp.isBlank() && Files.isRegularFile(workingDir.resolve(envPropFile))) {
+            if (!envProp.isBlank() && Files.isRegularFile(workingDir.resolve(envPropFile))) {
                 System.out.println(" - picking up env " + envProp
                         + " property file = " + envPropFile);
                 config.setProperty(envProp.replaceAll("\\_", ".").toLowerCase(), envPropFile);
