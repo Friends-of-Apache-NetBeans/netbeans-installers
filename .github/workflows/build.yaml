@@ -14,7 +14,14 @@ on:
           Provide the jdk properties-name for this build. 
           Defaults to the value jdk.properties in 'build.properties'
           example: zulu-25
-        type: string
+        type: choice 
+        options:
+          - 'zulu-25'
+          - 'zulu-21'
+          - 'zulufx-25'
+          - 'temurin-25'
+          - 'none'
+        default: 'zulu-25'
       github-release: 
         description: |
           GitHub release tag to upload to, like 'nb29-zulu-25'.
