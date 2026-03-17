@@ -23,7 +23,7 @@ on the workflow output page.
 ## Build for the public
 
 When you want to build for the public, you may want to follow the instructions on the [wiki](https://github.com/Friends-of-Apache-NetBeans/netbeans-installers/wiki/) of this repository.
-That also describes the GitHub Actions you have to trigger on the companion repository [netbeans-installers-site](https://github.com/Friends-of-Apache-NetBeans/netbeans-installers-site/)  to update the [Friends-of-Apache-NetBeans installers'](https://installer.friendsofapachenetbeans.org) website.
+That also describes the GitHub Actions you have to trigger on the companion repository [netbeans-installers-site](https://github.com/Friends-of-Apache-NetBeans/netbeans-installers-site/)  to update the [Friends-of-Apache-NetBeans installers'](https://installers.friendsofapachenetbeans.org) website.
 
 ## Legal
 
