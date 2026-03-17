@@ -7,7 +7,7 @@ on:
         description: Architecture type
         required: true
         type: string
-      package_type:
+      package-type:
         description: Package type
         required: true
         type: string
@@ -30,14 +30,14 @@ jobs:
     permissions:
       contents: write
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v6
-      #   with:
-      #     persist-credentials: false
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Show config
         run: |
           echo "Building for ${{ inputs.arch }}"
-          echo "Package type: ${{ inputs.package_type }}"
+          echo "Package type: ${{ inputs.package-type }}"
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
@@ -61,13 +61,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
         run: |
-          gh release upload ${{ inputs.github-release }} --clobber *.${{inputs.package_type}}
+          gh release upload ${{ inputs.github-release }} --clobber *.${{inputs.package-type}}
       - name: Upload to workflow
         if: ${{! inputs.github-release }}
         uses: actions/upload-artifact@v7
         with: 
-          name: linux-${{inputs.package_type}}-${{inputs.arch}}
+          name: linux-${{inputs.package-type}}-${{inputs.arch}}
           path: |
-            dist/*.${{inputs.package_type}}
-            dist/*.${{inputs.package_type}}.sha
+            dist/*.${{inputs.package-type}}
+            dist/*.${{inputs.package-type}}.sha
     
