@@ -109,7 +109,9 @@ jobs:
         env: 
           NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
-        run: java Exec.java validate-cache
+        run: |
+          java Exec.java validate-cache
+          echo "github.run_id=${{github.run_id}}" >> dist/effective.properties
       - name: Upload Validated Properties
         if: ${{inputs.github-release}}
         env:
