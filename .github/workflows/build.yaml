@@ -138,39 +138,15 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - name: Setup JDK
-        uses: actions/setup-java@v5
+          ref: actionsdry
+      - name: Build deb x64
+        uses: ./.github/workflows/buildlinux.yaml@main
         with:
-          java-version: 21
-          distribution: 'zulu'
-      - name: Setup caches
-        uses: actions/cache@v5
-        with:
-          path: cache
-          key: ${{ hashFiles('Exec.java', '*.properties') }}
-          enableCrossOsArchive: true
-      - name: Build
-        env:
-          DPKG_DEB_COMPRESSOR_TYPE: xz
-          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
-          JDK_PROPERTIES: ${{inputs.jdk-properties}}
-        run: java Exec.java build linux x64 deb
-      - name: Upload to release
-        if: ${{ inputs.github-release }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ./dist
-        run: |
-          gh release upload ${{ inputs.github-release }} --clobber *.deb
-      - name: Upload to workflow
-        if: ${{! inputs.github-release }}
-        uses: actions/upload-artifact@v7
-        with: 
-          name: linux-deb-x64
-          path: |
-            dist/*.deb
-            dist/*.deb.sha
-
+          github-release: ${{inputs.github-release}}
+          jdk-properties: ${{inputs.jdk-properties}}
+          netbeans-properties: ${{inputs.netbeans-properties}}
+          package_type: deb
+          arch: x86
 
   build-deb-arm:
     name: Build Linux .deb for arm64

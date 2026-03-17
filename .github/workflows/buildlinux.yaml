@@ -1,0 +1,73 @@
+name: Build Linux
+
+on:
+  workflow_call:
+    inputs:
+      arch:
+        description: Architecture type
+        required: true
+        type: string
+      package_type:
+        description: Package type
+        required: true
+        type: string
+      github-release:
+        description: The github release tag
+        required: true
+        type: string
+      netbeans-properties:
+        description: Defines the netbeans release
+        required: true
+        type: string
+      jdk-properties:
+        description: Defines the jdk to bundle
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      # - name: Checkout
+      #   uses: actions/checkout@v6
+      #   with:
+      #     persist-credentials: false
+      - name: Build
+        run: |
+          echo "Building for ${{ inputs.arch }}"
+          echo "Package type: ${{ inputs.package_type }}"
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: 'zulu'
+      - name: Setup caches
+        uses: actions/cache@v5
+        with:
+          path: cache
+          key: ${{ hashFiles('Exec.java', '*.properties') }}
+          enableCrossOsArchive: true
+      - name: Build
+        env:
+          DPKG_DEB_COMPRESSOR_TYPE: xz
+          NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
+          JDK_PROPERTIES: ${{inputs.jdk-properties}}
+        run: java Exec.java build linux x64 deb
+      - name: Upload to release
+        if: ${{ inputs.github-release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ./dist
+        run: |
+          gh release upload ${{ inputs.github-release }} --clobber *.${{inputs.package_type}}
+      - name: Upload to workflow
+        if: ${{! inputs.github-release }}
+        uses: actions/upload-artifact@v7
+        with: 
+          name: linux-${{inputs.package_type}}-${{inputs.arch}}
+          path: |
+            dist/*.${{inputs.package_type}}
+            dist/*.${{inputs.package_type}}.sha
+    
