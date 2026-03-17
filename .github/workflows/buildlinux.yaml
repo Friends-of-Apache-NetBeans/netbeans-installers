@@ -49,12 +49,17 @@ jobs:
           path: cache
           key: ${{ hashFiles('Exec.java', '*.properties') }}
           enableCrossOsArchive: true
+      - name: Install RPM tools
+        if: ${{ inputs.package-type == 'rpm' }}
+        run: |
+          sudo apt update
+          sudo apt install rpm
       - name: Build
         env:
           DPKG_DEB_COMPRESSOR_TYPE: xz
           NETBEANS_PROPERTIES: ${{inputs.netbeans-properties}}
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
-        run: java Exec.java build linux x64 deb
+        run: java Exec.java build linux ${{inputs.arch}} ${{inputs.package-type}}
       - name: Upload to release
         if: ${{ inputs.github-release }}
         env:
