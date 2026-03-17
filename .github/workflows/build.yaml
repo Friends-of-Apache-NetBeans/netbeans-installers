@@ -20,6 +20,7 @@ on:
           - 'zulu-21'
           - 'zulufx-25'
           - 'temurin-25'
+          - 'bellsoft-25'
           - 'none'
         default: 'zulu-25'
       github-release: 
