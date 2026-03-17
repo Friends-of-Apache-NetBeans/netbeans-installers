@@ -138,7 +138,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-          ref: actionsdry
       - name: Build deb x64
         uses: ./.github/workflows/buildlinux.yaml@main
         with:
