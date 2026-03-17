@@ -136,8 +136,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+        # with:
+        #   persist-credentials: false
       - name: Build deb x64
         uses: ./.github/workflows/buildlinux.yaml@main
         with:

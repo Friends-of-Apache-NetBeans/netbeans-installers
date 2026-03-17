@@ -1,4 +1,4 @@
-name: Build Linux
+name: Build-Linux
 
 on:
   workflow_call:
@@ -34,7 +34,7 @@ jobs:
       #   uses: actions/checkout@v6
       #   with:
       #     persist-credentials: false
-      - name: Build
+      - name: Show config
         run: |
           echo "Building for ${{ inputs.arch }}"
           echo "Package type: ${{ inputs.package_type }}"
