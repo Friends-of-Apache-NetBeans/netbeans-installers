@@ -129,12 +129,13 @@ jobs:
   build-deb-x64:
     name: Build Linux .deb for x86_64
     if: ${{ inputs.build-deb-x64 }}
+    needs: validate
     uses: ./.github/workflows/buildlinux.yaml
     with:
       github-release: ${{inputs.github-release}}
       jdk-properties: ${{inputs.jdk-properties}}
       netbeans-properties: ${{inputs.netbeans-properties}}
-      package_type: deb
+      package-type: deb
       arch: x86
 
   build-deb-arm:
