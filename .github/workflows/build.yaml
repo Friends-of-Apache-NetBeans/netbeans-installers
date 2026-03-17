@@ -129,23 +129,13 @@ jobs:
   build-deb-x64:
     name: Build Linux .deb for x86_64
     if: ${{ inputs.build-deb-x64 }}
-    needs: validate
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        # with:
-        #   persist-credentials: false
-      - name: Build deb x64
-        uses: ./.github/workflows/buildlinux.yaml@main
-        with:
-          github-release: ${{inputs.github-release}}
-          jdk-properties: ${{inputs.jdk-properties}}
-          netbeans-properties: ${{inputs.netbeans-properties}}
-          package_type: deb
-          arch: x86
+    uses: ./.github/workflows/buildlinux.yaml
+    with:
+      github-release: ${{inputs.github-release}}
+      jdk-properties: ${{inputs.jdk-properties}}
+      netbeans-properties: ${{inputs.netbeans-properties}}
+      package_type: deb
+      arch: x86
 
   build-deb-arm:
     name: Build Linux .deb for arm64
