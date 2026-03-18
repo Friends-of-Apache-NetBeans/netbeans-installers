@@ -30,10 +30,6 @@ on:
           NOTE: If given, the release must exist.
         type: string
         required: false
-      sign-artifacts: 
-        description: set to sign the windows and macos artifacts.
-        type: boolean
-        default: false
       build-deb-x64:
         description: 'Build Linux .deb for x86_64'
         type: boolean
@@ -46,12 +42,20 @@ on:
       build-windows-x64:
         description: 'Build Windows .exe for x86_64'
         type: boolean
+      sign-windows: 
+        description: 'Sign the Windows artifacts.'
+        type: boolean
+        default: false
       build-macos-arm:
         description: 'Build macOS .pkg for aarch64'
         type: boolean
       build-macos-x64:
         description: 'Build macOS .pkg for x86_64'
         type: boolean
+      sign-macos:
+        description: 'Sign the Apple macOS artifacts.'
+        type: boolean
+        default: false
 
 jobs:
   
