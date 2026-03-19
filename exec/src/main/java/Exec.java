@@ -46,7 +46,7 @@ public class Exec {
     private static final String COMMAND_HASH = "hash";
 
     private final Path workingDir, cacheDir;
-    private final Properties config;
+    final Properties config;
 
     private final String os, arch, type;
     private final HttpClient httpClient;
@@ -63,6 +63,23 @@ public class Exec {
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
     }
+
+    public Properties getConfig() {
+        return config;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public String getArch() {
+        return arch;
+    }
+
+    public String getType() {
+        return type;
+    }
+
 
     void build() throws Exception {
 
@@ -137,11 +154,9 @@ public class Exec {
     }
 
     Path resource(String id) throws Exception {
-        String link = config.getProperty(id + ".url", "");
-        String hash = config.getProperty(id + ".sha", "");
-        if (link.isBlank() || hash.isBlank()) {
-            throw new IllegalArgumentException("Missing link and hash for resource : " + id);
-        }
+        String link = config.getProperty((id + ".url").intern(), "");
+        String hash = config.getProperty((id + ".sha").intern(), "");
+        ensureExistence(link, hash, id);
         URI uri = URI.create(link);
         Path resource = cacheDir.resolve(fileName(uri));
         if (!Files.exists(resource)) {
@@ -151,6 +166,14 @@ public class Exec {
         System.out.println("Verifying : " + resource.getFileName());
         Hash.verifyFile(resource, hash);
         return resource;
+    }
+
+    void ensureExistence(String link, String hash, String id) throws IllegalArgumentException {
+        if (link.isBlank() || hash.isBlank()) {
+            System.out.println("Did not find url and hash in config for "+id );
+            config.entrySet().forEach(System.out::println);
+            throw new IllegalArgumentException("Missing link and/or hash for resource : " + id+"\n link='"+link+"'\n hash='"+hash+"'");
+        }
     }
 
     Path configureNBPackage()
@@ -203,7 +226,7 @@ public class Exec {
         cmd.add("--config");
         cmd.add(pkgConfig.toString());
         cmd.add("-Pversion=" + version);
-        if (!config.getProperty("jdk.variant").equals("none")) {
+        if (null!=jdk) {
             cmd.add("-Pruntime=" + jdk.toString());
         }
         if (type.equals("innosetup")) {
@@ -382,11 +405,11 @@ public class Exec {
         // amend config with env.
         var envProps = List.of("NETBEANS_PROPERTIES", "JDK_PROPERTIES");
         for (String envProp : envProps) {
-            // strip .properties to be lenient toward end with .properties ending or without.
             String s = System.getenv().get(envProp);
             if (s == null) {
                 continue;
             }
+            // strip .properties to be lenient toward the filename ending with .properties or without.
             String envPropFile = s.replaceFirst(".properties", "") + ".properties";
             if (!envProp.isBlank() && Files.isRegularFile(workingDir.resolve(envPropFile))) {
                 System.out.println(" - picking up env " + envProp

@@ -7,5 +7,10 @@ nbpackage/
 .env
 artifacts/
 dist/
-/exec/nbproject/private/
-/exec/build/
+/exec/target/
+/exec/build.properties
+/exec/cache
+/exec/nb29.properties
+/exec/nbproject/
+/exec/zulu-25.properties
+
