@@ -46,7 +46,7 @@ public class Exec {
     private static final String COMMAND_HASH = "hash";
 
     private final Path workingDir, cacheDir;
-    private final Properties config;
+    final Properties config;
 
     private final String os, arch, type;
     private final HttpClient httpClient;
@@ -154,8 +154,8 @@ public class Exec {
     }
 
     Path resource(String id) throws Exception {
-        String link = config.getProperty(id + ".url", "");
-        String hash = config.getProperty(id + ".sha", "");
+        String link = config.getProperty((id + ".url").intern(), "");
+        String hash = config.getProperty((id + ".sha").intern(), "");
         ensureExistence(link, hash, id);
         URI uri = URI.create(link);
         Path resource = cacheDir.resolve(fileName(uri));

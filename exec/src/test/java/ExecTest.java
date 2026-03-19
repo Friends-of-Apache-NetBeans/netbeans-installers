@@ -4,7 +4,9 @@
  */
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +22,12 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 public class ExecTest {
 
+    public ExecTest() throws IOException {
+        workingDir = Path.of("").toAbsolutePath();
+        cacheDir = workingDir.resolve("cache");
+        config = Exec.loadConfig(Path.of(""));
+    }
+
     @Test
     public void testConfig() throws IOException {
         Properties config = Exec.loadConfig(Path.of(""));
@@ -29,37 +37,49 @@ public class ExecTest {
 
     @ParameterizedTest
     @CsvSource({
-        "linux,x86,deb",
-        "linux,x86,rpm",
+        "linux,X64,deb",
+        "linux,X64,rpm",
         "linux,arm,deb",
-        "macos,x86,pkg",
+        "macos,X64,pkg",
         "macos,arm,pkg",
-        "windows,x86,exe"
+        "windows,X64,exe"
     }
     )
     public void testResource(String os, String arch, String type) throws IOException {
-        Properties config = Exec.loadConfig(Path.of(""));
-        Path workingDir = Path.of("").toAbsolutePath();
-        Path cacheDir = workingDir.resolve("cache");
         String cmd = "show";
         Exec exec = new Exec(workingDir, cacheDir, config, os, arch, type);
         ThrowableAssert.ThrowingCallable code = () -> exec.ensureExistence(type, arch, os);
-        assertThatCode(code).as("not found "+os+"-"+arch+"-"+type).doesNotThrowAnyException();
+        assertThatCode(code).as("not found " + os + "-" + arch + "-" + type).doesNotThrowAnyException();
     }
+
+    Path cacheDir;
+    Path workingDir;
+    Properties config;
 
     @Test
     public void testValidate() throws IOException {
-        Properties config = Exec.loadConfig(Path.of(""));
-        Path workingDir = Path.of("").toAbsolutePath();
-        Path cacheDir = workingDir.resolve("cache");
-        Exec exec = new Exec(workingDir, cacheDir, config, "linux", "x86", "rpm");
+        Exec exec = new Exec(workingDir, cacheDir, config, "linux", "X64", "rpm");
         ThrowableAssert.ThrowingCallable code = () -> exec.validate(true);
         assertThatCode(code).as("validate").doesNotThrowAnyException();
     }
 
-    @Test
-    public void testBuildCommandLine() {
-        
 
+    @ParameterizedTest(name="{0}.{1}.{2}")
+    @CsvSource({
+        "linux,x64,deb",
+        "linux,x64,rpm",
+        "linux,arm,deb",
+        "macos,x64,pkg",
+        "macos,arm,pkg",
+        "windows,x64,exe"
+    }
+    )
+    public void testResourceKey(String os, String arch, String type) throws Exception {
+
+        Exec exec = new Exec(workingDir, cacheDir, config, os, arch,type);
+        String id = "jdk." + os + "." + arch;
+        System.out.println("id = " + id);
+        var orDefault = (String)exec.config.getOrDefault(id+".url", "");
+        assertThat(orDefault).as("breaks for "+ id+".url").isNotBlank();
     }
 }

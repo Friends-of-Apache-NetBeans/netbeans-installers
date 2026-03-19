@@ -140,7 +140,7 @@ jobs:
       jdk-properties: ${{inputs.jdk-properties}}
       netbeans-properties: ${{inputs.netbeans-properties}}
       package-type: deb
-      arch: x86
+      arch: x64
 
   build-deb-arm:
     name: Build Linux .deb for arm64
@@ -164,7 +164,7 @@ jobs:
       jdk-properties: ${{inputs.jdk-properties}}
       netbeans-properties: ${{inputs.netbeans-properties}}
       package-type: rpm
-      arch: x86
+      arch: x64
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
