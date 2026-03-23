@@ -16,10 +16,11 @@ on:
           example: zulu-25
         type: choice 
         options:
+          - 'zulu-26'
           - 'zulu-25'
-          - 'zulu-21'
           - 'zulufx-25'
           - 'temurin-25'
+          - 'zulu-21'
           - 'bellsoft-25'
           - 'none'
         default: 'zulu-25'
