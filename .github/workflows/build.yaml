@@ -134,6 +134,8 @@ jobs:
     name: Build Linux .deb for x86_64
     if: ${{ inputs.build-deb-x64 }}
     needs: validate
+    permissions:
+      contents: write
     uses: ./.github/workflows/buildlinux.yaml
     with:
       github-release: ${{inputs.github-release}}
@@ -146,6 +148,8 @@ jobs:
     name: Build Linux .deb for arm64
     if: ${{ inputs.build-deb-arm }}
     needs: validate
+    permissions:
+      contents: write
     uses: ./.github/workflows/buildlinux.yaml
     with:
       github-release: ${{inputs.github-release}}
@@ -158,6 +162,8 @@ jobs:
     name: Build Linux .rpm for x64
     if: ${{ inputs.build-rpm-x64 }}
     needs: validate
+    permissions:
+      contents: write
     uses: ./.github/workflows/buildlinux.yaml
     with:
       github-release: ${{inputs.github-release}}
