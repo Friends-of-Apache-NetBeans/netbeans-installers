@@ -75,4 +75,3 @@ jobs:
           path: |
             dist/*.${{inputs.package-type}}
             dist/*.${{inputs.package-type}}.sha
-    
