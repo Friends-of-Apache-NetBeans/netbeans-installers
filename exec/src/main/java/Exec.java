@@ -22,6 +22,7 @@ import java.nio.file.attribute.*;
 import java.security.*;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.*;
 
@@ -79,7 +80,6 @@ public class Exec {
     public String getType() {
         return type;
     }
-
 
     void build() throws Exception {
 
@@ -170,9 +170,9 @@ public class Exec {
 
     void ensureExistence(String link, String hash, String id) throws IllegalArgumentException {
         if (link.isBlank() || hash.isBlank()) {
-            System.out.println("Did not find url and hash in config for "+id );
+            System.out.println("Did not find url and hash in config for " + id);
             config.entrySet().forEach(System.out::println);
-            throw new IllegalArgumentException("Missing link and/or hash for resource : " + id+"\n link='"+link+"'\n hash='"+hash+"'");
+            throw new IllegalArgumentException("Missing link and/or hash for resource : " + id + "\n link='" + link + "'\n hash='" + hash + "'");
         }
     }
 
@@ -226,7 +226,7 @@ public class Exec {
         cmd.add("--config");
         cmd.add(pkgConfig.toString());
         cmd.add("-Pversion=" + version);
-        if (null!=jdk) {
+        if (null != jdk) {
             cmd.add("-Pruntime=" + jdk.toString());
         }
         if (type.equals("innosetup")) {
@@ -527,8 +527,6 @@ public class Exec {
         }
     }
 
-    Pattern packageNamePattern = Pattern.compile("^(?<prefix>.*?)((?<archSep>[\\.\\-_])?(?<arch>x86_64|arm64|amd64))?(?<ext>\\.(exe|pkg|deb|rpm))$");
-
     /**
      * Insert JDK-variant into file name.
      *
@@ -538,30 +536,45 @@ public class Exec {
      * {@code file.exe -> file-variant.exe}
      */
     Path insertJDKVariant(Path orgFile, String variant) throws IOException {
-        var matcher = packageNamePattern.matcher(orgFile.getFileName().toString());
-        Path result = orgFile;
         if (variant == null || variant.isBlank() || variant.equals("none")) {
-            return result;
+            return orgFile;
         }
-        if (matcher.matches()) {
-            int groupCount = matcher.groupCount();
+        Path result = orgFile;
+        var orgName = orgFile.getFileName().toString();
+        String resultName = orgName;
+        resultName = computeNewName(orgName, variant);
+        if (!resultName.equals(orgName)) {
+            result = Files.move(result, result.resolveSibling(resultName));
+        }
+        return result;
+    }
 
+    static Pattern packageNamePattern = Pattern.compile("^(?<prefix>.*?)((?<archSep>[\\.\\-_]\\d+[_\\.])?(?<arch>x86_64|arm64|amd64))?(?<ext>\\.(exe|pkg|deb|rpm))$");
+
+    static String computeNewName(String orgName, String variant) {
+        if (variant == null || variant.isBlank() || variant.equals("none")) {
+            return orgName;
+        }
+        var matcher = packageNamePattern.matcher(orgName);
+        var resultName = orgName;
+        boolean hasMatch = matcher.matches();
+        if (hasMatch) {
+            int groupCount = matcher.groupCount();
             var prefix = matcher.group("prefix");
             var arch = matcher.group("arch");
             var archSep = matcher.group("archSep");
             var ext = matcher.group("ext");
             arch = arch == null ? "" : arch;
-            arch = arch != null ? arch : "";
-            String resultName
+            archSep = archSep == null ? "" : archSep;
+            resultName
                     = switch (ext) {
                 case ".exe" ->
                     prefix + '-' + variant + ext;
                 default ->
-                    prefix + archSep + variant + archSep + arch + ext;
+                    prefix +'-'+ variant + archSep + arch + ext;
             };
-            result = Files.move(result, result.resolveSibling(resultName));
         }
-        return result;
+        return resultName;
     }
 
 }

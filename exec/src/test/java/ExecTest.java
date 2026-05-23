@@ -25,7 +25,7 @@ public class ExecTest {
     public ExecTest() throws IOException {
         workingDir = Path.of("").toAbsolutePath();
         cacheDir = workingDir.resolve("cache");
-        config = Exec.loadConfig(Path.of(""));
+        config = Exec.loadConfig(Path.of("../"));
     }
 
     @Test
@@ -81,5 +81,24 @@ public class ExecTest {
         System.out.println("id = " + id);
         var orDefault = (String)exec.config.getOrDefault(id+".url", "");
         assertThat(orDefault).as("breaks for "+ id+".url").isNotBlank();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "Apache-NetBeans-30.exe,none, Apache-NetBeans-30.exe",
+        "Apache-NetBeans-30-rc2.exe,none, Apache-NetBeans-30-rc2.exe",
+        "Apache-NetBeans-30-arm64.pkg,none,Apache-NetBeans-30-arm64.pkg",
+        "Apache-NetBeans-30-arm64-rc2.pkg,none,Apache-NetBeans-30-arm64-rc2.pkg",
+        "Apache-NetBeans_30-rc2-1_arm64.pkg,none,Apache-NetBeans_30-rc2-1_arm64.pkg",
+        "Apache-NetBeans_30-rc2-1_arm64.deb,zulu25,Apache-NetBeans_30-rc2-zulu25-1_arm64.deb",
+        "Apache-NetBeans_30-1_arm64.deb,zulu25,Apache-NetBeans_30-zulu25-1_arm64.deb",
+        "Apache-NetBeans_30-0.x86_64.rpm,zulu25,Apache-NetBeans_30-zulu25-0.x86_64.rpm",
+        "Apache-NetBeans_31-rc1-0.x86_64.rpm,zulu-25,Apache-NetBeans_31-rc1-zulu-25-0.x86_64.rpm",
+
+    })
+    public void testComputeNewName(String orgName, String variant, String expected) {
+        var result=Exec.computeNewName( orgName, variant);
+        assertEquals(expected, result, "orgname = "+orgName);
+
     }
 }
