@@ -85,13 +85,23 @@ public class ExecTest {
 
     @ParameterizedTest
     @CsvSource({
+        //win
         "Apache-NetBeans-30.exe,none, Apache-NetBeans-30.exe",
+        "Apache-NetBeans-30.exe,temurin-25, Apache-NetBeans-30-temurin-25.exe",
         "Apache-NetBeans-30-rc2.exe,none, Apache-NetBeans-30-rc2.exe",
+        "Apache-NetBeans-30-rc2.exe,zulu-26, Apache-NetBeans-30-rc2-zulu-26.exe",
+       // macos
         "Apache-NetBeans-30-arm64.pkg,none,Apache-NetBeans-30-arm64.pkg",
-        "Apache-NetBeans-30-arm64-rc2.pkg,none,Apache-NetBeans-30-arm64-rc2.pkg",
-        "Apache-NetBeans_30-rc2-1_arm64.pkg,none,Apache-NetBeans_30-rc2-1_arm64.pkg",
+        "Apache-NetBeans-30-arm64.pkg,zulu-25,Apache-NetBeans-30-zulu-25-arm64.pkg",
+        "Apache-NetBeans-30-rc2-arm64.pkg,none,Apache-NetBeans-30-rc2-arm64.pkg",
+        "Apache-NetBeans_30-rc2-arm64.pkg,temurin-26,Apache-NetBeans_30-rc2-temurin-26-arm64.pkg",
+        // deb
+        "Apache-NetBeans_30-rc2-1_arm64.deb,none,Apache-NetBeans_30-rc2-1_arm64.deb",
+        "Apache-NetBeans_30-1_arm64.deb,liberica-21,Apache-NetBeans_30-liberica-21-1_arm64.deb",
         "Apache-NetBeans_30-rc2-1_arm64.deb,zulu25,Apache-NetBeans_30-rc2-zulu25-1_arm64.deb",
         "Apache-NetBeans_30-1_arm64.deb,zulu25,Apache-NetBeans_30-zulu25-1_arm64.deb",
+        //rpm
+        "Apache-NetBeans_30-0.x86_64.rpm,none,Apache-NetBeans_30-0.x86_64.rpm",
         "Apache-NetBeans_30-0.x86_64.rpm,zulu25,Apache-NetBeans_30-zulu25-0.x86_64.rpm",
         "Apache-NetBeans_31-rc1-0.x86_64.rpm,zulu-25,Apache-NetBeans_31-rc1-zulu-25-0.x86_64.rpm",
 

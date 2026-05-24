@@ -561,17 +561,21 @@ public class Exec {
         if (hasMatch) {
             int groupCount = matcher.groupCount();
             var prefix = matcher.group("prefix");
+            // the regex may leave on a '-' for some combinations
+            if (prefix.endsWith("-")) {
+                prefix = prefix.substring(0, prefix.length() - 1);
+            }
             var arch = matcher.group("arch");
             var archSep = matcher.group("archSep");
             var ext = matcher.group("ext");
             arch = arch == null ? "" : arch;
-            archSep = archSep == null ? "" : archSep;
+            archSep = archSep == null ? "-" : archSep;
             resultName
                     = switch (ext) {
                 case ".exe" ->
                     prefix + '-' + variant + ext;
                 default ->
-                    prefix +'-'+ variant + archSep + arch + ext;
+                    prefix + '-' + variant + archSep + arch + ext;
             };
         }
         return resultName;
