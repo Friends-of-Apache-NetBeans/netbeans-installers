@@ -211,7 +211,7 @@ jobs:
             dist/*.exe
             dist/*.exe.sha
       - name: Sign with signpath
-        if: ${{ inputs.sign-artifacts }}
+        if: ${{ inputs.sign-windows }}
         id: signing
         uses: signpath/github-action-submit-signing-request@v2
         with:
@@ -225,14 +225,14 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: signed
       - name: Upload to release
-        if: ${{ inputs.github-release && inputs.sign-artifacts }}
+        if: ${{ inputs.github-release && inputs.sign-windows }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./signed
         run: |
           gh release upload ${{ inputs.github-release }} --clobber *.exe
       - name: Upload unsigned to release
-        if: ${{ inputs.github-release && ! inputs.sign-artifacts }}
+        if: ${{ inputs.github-release && ! inputs.sign-windows }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: ./dist
