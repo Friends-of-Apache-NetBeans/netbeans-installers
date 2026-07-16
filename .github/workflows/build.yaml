@@ -20,6 +20,7 @@ on:
           - 'zulu-25'
           - 'zulufx-25'
           - 'temurin-25'
+          - 'temurin-26'
           - 'zulu-21'
           - 'bellsoft-25'
           - 'none'
