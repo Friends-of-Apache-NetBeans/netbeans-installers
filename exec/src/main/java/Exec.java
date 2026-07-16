@@ -260,8 +260,8 @@ public class Exec {
                 throw new IllegalStateException();
         };
 
-        String jdkVariant = config.getProperty("jdk.variant", "");
-        result = insertJDKVariant(result, jdkVariant);
+        // String jdkVariant = config.getProperty("jdk.variant", "");
+        // result = insertJDKVariant(result, jdkVariant);
         String fileName = result.getFileName().toString();
         String resultHash = Hash.SHA256.hashFile(result);
         Files.writeString(result.resolveSibling(fileName + ".sha256"),
