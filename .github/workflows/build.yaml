@@ -24,10 +24,10 @@ on:
           - 'zulu-21'
           - 'bellsoft-25'
           - 'none'
-        default: 'zulu-25'
+        default: 'temurin-26'
       github-release: 
         description: |
-          GitHub release tag to upload to, like 'nb29-zulu-25'.
+          GitHub release tag to upload to, like 'nb31-temurin-26'.
           If not given, the aritfacts will not be uploaded to a release.
           NOTE: If given, the release must exist.
         type: string
@@ -117,6 +117,14 @@ jobs:
           JDK_PROPERTIES: ${{inputs.jdk-properties}}
         run: |
           java Exec.java validate-cache
+          echo "build-deb-xarm=${{inputs.build-deb-x64}}" >> dist/effective.properties
+          echo "build-deb-arm=${{inputs.build-deb-arm}}" >> dist/effective.properties
+          echo "build-rpm-x64=${{inputs.build-rpm-x64}}" >> dist/effective.properties
+          echo "build-windows=${{inputs.build-windows-x64}}" >> dist/effective.properties
+          echo "sign-windows=${{inputs.sign-windows}} # windows sign request" >> dist/effective.properties
+          echo "build-macos-arm=${{inputs.build-macos-arm}}" >> dist/effective.properties
+          echo "build-macos-x64=${{inputs.build-macos-x64}}" >> dist/effective.properties
+          echo "sign-macos=${{inputs.sign-macos}} # macos sign request" >> dist/effective.properties
           echo "github.run_id=${{github.run_id}}" >> dist/effective.properties
       - name: Upload Validated Properties
         if: ${{inputs.github-release}}
