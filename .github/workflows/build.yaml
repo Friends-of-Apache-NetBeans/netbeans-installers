@@ -244,7 +244,7 @@ jobs:
     name: Build macOS .pkg for arm64
     if: ${{ inputs.build-macos-arm }}
     needs: validate
-    runs-on: macos-14
+    runs-on: macos-15
     permissions:
       contents: write
     defaults:
@@ -320,7 +320,7 @@ jobs:
     name: Build macOS .pkg for x86_64
     if: ${{ inputs.build-macos-x64 }}
     needs: validate
-    runs-on: macos-14
+    runs-on: macos-15
     permissions:
       contents: write
     defaults:
