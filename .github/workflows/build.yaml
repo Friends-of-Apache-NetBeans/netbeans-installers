@@ -336,7 +336,7 @@ jobs:
     name: Build macOS .pkg for x86_64
     if: ${{ inputs.build-macos-x64 }}
     needs: validate
-    runs-on: macos-14
+    runs-on: macos-14-xlarge
     permissions:
       contents: write
     defaults:
