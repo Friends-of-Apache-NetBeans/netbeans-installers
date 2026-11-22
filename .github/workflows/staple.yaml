@@ -45,11 +45,20 @@ jobs:
           echo "run_id= ${RUN_ID}"
           gh run download ${RUN_ID} -D dist
       - name: Staple
-        run: | 
+        run: |
           for mypackage in $(find dist -name "*.pkg" -type f ); do
             (
               cd $(dirname ${mypackage})
-              xcrun stapler staple $(basename ${mypackage})
+              # notarytool --wait confirms Apple accepted the submission, but the
+              # ticket can take a short while longer to propagate to the CloudKit
+              # lookup that `stapler staple` queries, so retry briefly.
+              for attempt in 1 2 3 4 5 6; do
+                xcrun stapler staple $(basename ${mypackage}) && exit 0
+                echo "staple attempt ${attempt} failed, retrying in 30s..."
+                sleep 30
+              done
+              echo "staple failed after retries for $(basename ${mypackage})"
+              exit 1
             )
           done
       - name: Upload
