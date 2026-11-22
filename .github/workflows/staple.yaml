@@ -65,4 +65,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload --clobber "${{ inputs.github-release }}" --clobber $(find dist -type f ! -name "*.sha*")
+          # only upload the stapled .pkg files: the run's artifacts can also
+          # contain other platforms' outputs (rpm/deb/exe), and re-uploading
+          # those here would clobber newer assets from other builds/signing
+          # runs with stale copies.
+          gh release upload --clobber "${{ inputs.github-release }}" $(find dist -name "*.pkg" -type f)
