@@ -17,6 +17,7 @@ on:
         type: choice
         options:
           - 'temurin-27'
+          - 'zulu-27'
           - 'zulu-26'
           - 'zulu-25'
           - 'zulufx-25'
