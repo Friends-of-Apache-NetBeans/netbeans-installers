@@ -231,6 +231,10 @@ public class Exec {
         }
         if (type.equals("innosetup")) {
             cmd.add("-Pinnosetup.tool=" + System.getenv("INNOSETUP_PATH"));
+            String innosetupParams = config.getProperty("innosetup.parameters", "");
+            if (!innosetupParams.isBlank()) {
+                cmd.add("-Pinnosetup.parameters=" + innosetupParams);
+            }
         } else if (type.equals("pkg")) {
             String APP_CERT_ID = System.getenv("APP_CERT_ID");
             if (APP_CERT_ID != null) {
