@@ -258,6 +258,8 @@ public class Exec {
                 findFile(dist, "*.rpm");
             case "innosetup" ->
                 findFile(dist, "*.exe");
+            case "appimage" ->
+                findFile(dist, "*.AppImage");
             case "pkg" ->
                 findFile(dist, "*.pkg");
             default ->

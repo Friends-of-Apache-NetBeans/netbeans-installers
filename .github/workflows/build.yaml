@@ -43,6 +43,12 @@ on:
       build-rpm-x64:
         description: 'Build Linux .rpm for x86_64'
         type: boolean
+      build-appimage-x64:
+        description: 'Build Linux AppImage for x86_64'
+        type: boolean
+      build-appimage-arm:
+        description: 'Build Linux AppImage for aarch64'
+        type: boolean
       build-windows-x64:
         description: 'Build Windows .exe for x86_64'
         type: boolean
@@ -122,6 +128,8 @@ jobs:
           echo "build-deb-xarm=${{inputs.build-deb-x64}}" >> dist/effective.properties
           echo "build-deb-arm=${{inputs.build-deb-arm}}" >> dist/effective.properties
           echo "build-rpm-x64=${{inputs.build-rpm-x64}}" >> dist/effective.properties
+          echo "build-appimage-x64=${{inputs.build-appimage-x64}}" >> dist/effective.properties
+          echo "build-appimage-arm=${{inputs.build-appimage-arm}}" >> dist/effective.properties
           echo "build-windows=${{inputs.build-windows-x64}}" >> dist/effective.properties
           echo "sign-windows=${{inputs.sign-windows}} # windows sign request" >> dist/effective.properties
           echo "build-macos-arm=${{inputs.build-macos-arm}}" >> dist/effective.properties
@@ -183,6 +191,34 @@ jobs:
       netbeans-properties: ${{inputs.netbeans-properties}}
       package-type: rpm
       arch: x64
+
+  build-appimage-x64:
+    name: Build Linux AppImage for x86_64
+    if: ${{ inputs.build-appimage-x64 }}
+    needs: validate
+    permissions:
+      contents: write
+    uses: ./.github/workflows/buildlinux.yaml
+    with:
+      github-release: ${{inputs.github-release}}
+      jdk-properties: ${{inputs.jdk-properties}}
+      netbeans-properties: ${{inputs.netbeans-properties}}
+      package-type: appimage
+      arch: x64
+
+  build-appimage-arm:
+    name: Build Linux AppImage for aarch64
+    if: ${{ inputs.build-appimage-arm }}
+    needs: validate
+    permissions:
+      contents: write
+    uses: ./.github/workflows/buildlinux.yaml
+    with:
+      github-release: ${{inputs.github-release}}
+      jdk-properties: ${{inputs.jdk-properties}}
+      netbeans-properties: ${{inputs.netbeans-properties}}
+      package-type: appimage
+      arch: arm
 
   build-windows-x64:
     name: Build Windows .exe for x86_64
